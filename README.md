@@ -77,6 +77,16 @@ DeepSeek-OCR-WebUI 是一个基于 DeepSeek-OCR 模型的智能图像识别 Web 
 - 📍 精确的坐标定位
 - 🔄 响应式自动重绘
 
+**功能演示**：
+
+<div align="center">
+
+![Find模式演示](./assets/find_mode_screenshot.png)
+
+**查找定位模式实际效果：左侧上传操作，右侧自动圈选标注**
+
+</div>
+
 ---
 
 ## 🌐 多语言支持
