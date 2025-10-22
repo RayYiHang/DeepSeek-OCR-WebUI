@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 DeepSeek OCR - Next-Gen Vision AI</title>
+    <style>
+        :root {
+            --primary: #8b5cf6;
+            --primary-dark: #7c3aed;
+            --secondary: #06b6d4;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #0f172a;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* 动态背景 */
+        .animated-bg {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .bg-gradient-layer {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, 
+                rgba(147, 51, 234, 0.2) 0%, 
+                rgba(219, 39, 119, 0.2) 25%,
+                rgba(6, 182, 212, 0.2) 50%,
+                rgba(147, 51, 234, 0.2) 100%
+            );
+        }
+
+        .bg-pattern {
+            position: absolute;
+            inset: 0;
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMzLjMxIDAgNiAyLjY5IDYgNnMtMi42OSA2LTYgNi02LTIuNjktNi02IDIuNjktNiA2LTZ6TTI0IDZjMy4zMSAwIDYgMi42OSA2IDZzLTIuNjkgNi02IDYtNi0yLjY5LTYtNiAyLjY5LTYgNi02ek00OCAzNmMzLjMxIDAgNiAyLjY5IDYgNnMtMi42OSA2LTYgNi02LTIuNjktNi02IDIuNjktNiA2LTZ6IiBzdHJva2U9InJnYmEoMTQ3LCA1MSwgMjM0LCAwLjEpIiBzdHJva2Utd2lkdGg9IjIiLz48L2c+PC9zdmc+');
+            opacity: 0.3;
+        }
+
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.3;
+            animation: blob 8s ease-in-out infinite;
+        }
+
+        .blob-1 {
+            top: 10%;
+            left: 10%;
+            width: 400px;
+            height: 400px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #06b6d4 100%);
+            animation-delay: 0s;
+        }
+
+        .blob-2 {
+            bottom: 10%;
+            right: 10%;
+            width: 450px;
+            height: 450px;
+            background: linear-gradient(135deg, #06b6d4 0%, #8b5cf6 100%);
+            animation-delay: 2s;
+        }
+
+        .blob-3 {
+            top: 50%;
+            left: 50%;
+            width: 350px;
+            height: 350px;
+            background: linear-gradient(135deg, #db2777 0%, #8b5cf6 100%);
+            animation-delay: 4s;
+        }
+
+        @keyframes blob {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+            }
+            33% {
+                transform: translate(30px, -50px) scale(1.1);
+            }
+            66% {
+                transform: translate(-20px, 20px) scale(0.9);
+            }
+        }
+
+        /* 玻璃态效果 */
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .glass-strong {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* 容器 */
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            margin-bottom: 30px;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 20px 30px;
+            border-radius: 20px;
+        }
+
+        .logo-wrapper {
+            position: relative;
+            width: 50px;
+            height: 50px;
+        }
+
+        .logo-glow {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, #8b5cf6, #06b6d4);
+            border-radius: 12px;
+            filter: blur(15px);
+            opacity: 0.8;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .logo-icon {
+            position: relative;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #8b5cf6, #06b6d4);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.8; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.05); }
+        }
+
+        .header-text h1 {
+            font-size: 32px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff 0%, #e0e7ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 5px;
+        }
+
+        .header-text p {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 500;
+        }
+
+        /* 主内容区 */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        @media (min-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        /* 模式选择器 */
+        .mode-section {
+            padding: 25px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+        }
+
+        .mode-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: rgba(255, 255, 255, 0.95);
+        }
+
+        .mode-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+        }
+
+        .mode-card {
+            position: relative;
+            padding: 20px 15px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px solid transparent;
+            overflow: hidden;
+        }
+
+        .mode-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 15px;
+            padding: 2px;
+            background: linear-gradient(135deg, transparent, rgba(255,255,255,0.1), transparent);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .mode-card:hover {
+            transform: translateY(-4px);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .mode-card:hover::before {
+            opacity: 1;
+        }
+
+        .mode-card.active {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(6, 182, 212, 0.2));
+            border-color: rgba(139, 92, 246, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .mode-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+            display: block;
+            filter: drop-shadow(0 0 10px rgba(139, 92, 246, 0.5));
+        }
+
+        .mode-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        /* 输入框样式 */
+        .input-wrapper {
+            margin-top: 15px;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .input-field, .textarea-field {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: white;
+            font-size: 14px;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .input-field:focus, .textarea-field:focus {
+            outline: none;
+            border-color: #8b5cf6;
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
+        }
+
+        .input-field::placeholder, .textarea-field::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .textarea-field {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .input-hint {
+            margin-top: 8px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* 上传区域 */
+        .upload-section {
+            padding: 25px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+        }
+
+        .upload-area {
+            border: 3px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 60px 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: rgba(255, 255, 255, 0.02);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-area::before {
+            content: '';
+            position: absolute;
+            inset: -100%;
+            background: conic-gradient(from 0deg, transparent, #8b5cf6, transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
+            animation: rotate 3s linear infinite;
+        }
+
+        .upload-area:hover::before {
+            opacity: 0.1;
+        }
+
+        @keyframes rotate {
+            to { transform: rotate(360deg); }
+        }
+
+        .upload-area:hover, .upload-area.dragover {
+            border-color: #8b5cf6;
+            background: rgba(139, 92, 246, 0.05);
+            transform: scale(1.02);
+        }
+
+        .upload-icon-wrapper {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        .upload-icon-glow {
+            position: absolute;
+            inset: -10px;
+            background: linear-gradient(135deg, #8b5cf6, #06b6d4);
+            border-radius: 50%;
+            filter: blur(20px);
+            opacity: 0.5;
+        }
+
+        .upload-icon {
+            position: relative;
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #8b5cf6, #06b6d4);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            transition: all 0.3s;
+        }
+
+        .upload-area:hover .upload-icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .upload-text {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: rgba(255, 255, 255, 0.95);
+        }
+
+        .upload-hint {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* 图片预览 */
+        .image-preview-wrapper {
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            animation: fadeInScale 0.4s ease-out;
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .image-preview-wrapper img {
+            width: 100%;
+            display: block;
+        }
+
+        .remove-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 10px 20px;
+            background: rgba(239, 68, 68, 0.9);
+            backdrop-filter: blur(10px);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+
+        .remove-btn:hover {
+            background: rgba(220, 38, 38, 0.95);
+            transform: scale(1.05);
+        }
+
+        /* 按钮 */
+        .action-btn {
+            width: 100%;
+            padding: 16px 32px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #06b6d4 100%);
+            border: none;
+            border-radius: 15px;
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4);
+        }
+
+        .action-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, transparent, rgba(255,255,255,0.2), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+        }
+
+        .action-btn:hover::before {
+            transform: translateX(100%);
+        }
+
+        .action-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(139, 92, 246, 0.5);
+        }
+
+        .action-btn:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .action-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-content {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        /* 加载动画 */
+        .loading-spinner {
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* 结果区域 */
+        .result-section {
+            padding: 25px;
+            border-radius: 20px;
+        }
+
+        .result-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .result-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .result-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .icon-btn {
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(1.1);
+        }
+
+        .result-content {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            max-height: 500px;
+            overflow-y: auto;
+            color: rgba(255, 255, 255, 0.95);
+            line-height: 1.8;
+            font-size: 14px;
+        }
+
+        .result-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .result-content::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+
+        .result-content::-webkit-scrollbar-thumb {
+            background: rgba(139, 92, 246, 0.5);
+            border-radius: 10px;
+        }
+
+        .result-content::-webkit-scrollbar-thumb:hover {
+            background: rgba(139, 92, 246, 0.7);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            display: block;
+            opacity: 0.5;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .empty-text {
+            font-size: 18px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 10px;
+        }
+
+        .empty-hint {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Toast 通知 */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 15px 25px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 12px;
+            color: #0f172a;
+            font-weight: 600;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.3s;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.success {
+            border-left: 4px solid #10b981;
+        }
+
+        .toast.error {
+            border-left: 4px solid #ef4444;
+        }
+
+        .toast.info {
+            border-left: 4px solid #06b6d4;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .header-text h1 {
+                font-size: 24px;
+            }
+            
+            .mode-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .upload-area {
+                padding: 40px 20px;
+            }
+        }
+
+        /* 隐藏滚动条但保持功能 */
+        body::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        body::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        body::-webkit-scrollbar-thumb {
+            background: rgba(139, 92, 246, 0.5);
+            border-radius: 5px;
+        }
+
+        body::-webkit-scrollbar-thumb:hover {
+            background: rgba(139, 92, 246, 0.7);
+        }
+
+        /* Canvas for bounding boxes */
+        .canvas-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- 动态背景 -->
+    <div class="animated-bg">
+        <div class="bg-gradient-layer"></div>
+        <div class="bg-pattern"></div>
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <!-- 主容器 -->
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content glass-strong">
+                <div class="logo-wrapper">
+                    <div class="logo-glow"></div>
+                    <div class="logo-icon">✨</div>
+                </div>
+                <div class="header-text">
+                    <h1>DeepSeek OCR</h1>
+                    <p>Next-Gen Vision AI • 增强版 v3.0</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- 主内容 -->
+        <div class="main-grid">
+            <!-- 左侧面板 -->
+            <div>
+                <!-- 模式选择 -->
+                <div class="mode-section glass">
+                    <div class="mode-title">🎯 选择识别模式</div>
+                    <div class="mode-grid">
+                        <div class="mode-card active" data-mode="document">
+                            <span class="mode-icon">📄</span>
+                            <div class="mode-name">文档转Markdown</div>
+                        </div>
+                        <div class="mode-card" data-mode="ocr">
+                            <span class="mode-icon">📝</span>
+                            <div class="mode-name">通用OCR</div>
+                        </div>
+                        <div class="mode-card" data-mode="free">
+                            <span class="mode-icon">📋</span>
+                            <div class="mode-name">纯文本提取</div>
+                        </div>
+                        <div class="mode-card" data-mode="figure">
+                            <span class="mode-icon">📊</span>
+                            <div class="mode-name">图表解析</div>
+                        </div>
+                        <div class="mode-card" data-mode="describe">
+                            <span class="mode-icon">🖼️</span>
+                            <div class="mode-name">图像描述</div>
+                        </div>
+                        <div class="mode-card" data-mode="find">
+                            <span class="mode-icon">🔍</span>
+                            <div class="mode-name">查找定位</div>
+                        </div>
+                        <div class="mode-card" data-mode="freeform">
+                            <span class="mode-icon">✨</span>
+                            <div class="mode-name">自定义提示</div>
+                        </div>
+                    </div>
+
+                    <!-- Find 模式输入 -->
+                    <div id="findInput" class="input-wrapper" style="display: none;">
+                        <input type="text" id="findTerm" class="input-field" 
+                               placeholder="输入要查找的内容（如：Total, Invoice #）">
+                        <div class="input-hint">
+                            💡 系统会在图片中查找并标注此内容的位置
+                        </div>
+                    </div>
+
+                    <!-- Freeform 模式输入 -->
+                    <div id="freeformInput" class="input-wrapper" style="display: none;">
+                        <textarea id="customPrompt" class="textarea-field" 
+                                  placeholder="输入自定义提示词（如：提取所有日期和金额）"></textarea>
+                        <div class="input-hint">
+                            ✨ 输入任何自定义的识别需求，AI 会按照您的要求处理
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 上传区域 -->
+                <div class="upload-section glass">
+                    <div id="uploadArea" class="upload-area">
+                        <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                        <div class="upload-icon-wrapper">
+                            <div class="upload-icon-glow"></div>
+                            <div class="upload-icon">📤</div>
+                        </div>
+                        <div class="upload-text">拖拽图片到这里或点击上传</div>
+                        <div class="upload-hint">支持 JPG, PNG, JPEG, BMP, GIF • 最大 10MB</div>
+                    </div>
+
+                    <!-- 图片预览 -->
+                    <div id="imagePreview" style="display: none;">
+                        <div class="image-preview-wrapper">
+                            <img id="previewImg" alt="Preview">
+                            <button id="removeBtn" class="remove-btn">
+                                <span>×</span>
+                                <span>移除</span>
+                            </button>
+                            <canvas id="boxCanvas" class="canvas-overlay"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 处理按钮 -->
+                <button id="processBtn" class="action-btn" disabled>
+                    <div class="btn-content">
+                        <span id="btnIcon">🚀</span>
+                        <span id="btnText">开始识别</span>
+                    </div>
+                </button>
+            </div>
+
+            <!-- 右侧面板 - 结果 -->
+            <div>
+                <div class="result-section glass">
+                    <div class="result-header">
+                        <div class="result-title">
+                            <span>✨</span>
+                            <span>识别结果</span>
+                        </div>
+                        <div class="result-actions" id="resultActions" style="display: none;">
+                            <button class="icon-btn" id="copyBtn" title="复制">📋</button>
+                            <button class="icon-btn" id="downloadBtn" title="下载">💾</button>
+                        </div>
+                    </div>
+                    <div class="result-content" id="resultContent">
+                        <div class="empty-state">
+                            <span class="empty-icon">🎯</span>
+                            <div class="empty-text">准备就绪</div>
+                            <div class="empty-hint">上传图片并点击识别按钮开始处理</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast 通知 -->
+    <div id="toast" class="toast"></div>
+
+    <script>
+        const CONFIG = {
+            apiUrl: window.location.origin,
+            maxFileSize: 10 * 1024 * 1024 // 10MB
+        };
+
+        const state = {
+            mode: 'document',
+            image: null,
+            imagePreview: null,
+            processing: false
+        };
+
+        // 元素
+        const elements = {
+            modeCards: document.querySelectorAll('.mode-card'),
+            findInput: document.getElementById('findInput'),
+            freeformInput: document.getElementById('freeformInput'),
+            findTerm: document.getElementById('findTerm'),
+            customPrompt: document.getElementById('customPrompt'),
+            uploadArea: document.getElementById('uploadArea'),
+            fileInput: document.getElementById('fileInput'),
+            imagePreview: document.getElementById('imagePreview'),
+            previewImg: document.getElementById('previewImg'),
+            removeBtn: document.getElementById('removeBtn'),
+            boxCanvas: document.getElementById('boxCanvas'),
+            processBtn: document.getElementById('processBtn'),
+            btnIcon: document.getElementById('btnIcon'),
+            btnText: document.getElementById('btnText'),
+            resultContent: document.getElementById('resultContent'),
+            resultActions: document.getElementById('resultActions'),
+            copyBtn: document.getElementById('copyBtn'),
+            downloadBtn: document.getElementById('downloadBtn'),
+            toast: document.getElementById('toast')
+        };
+
+        // 初始化
+        function init() {
+            setupModeSelector();
+            setupUpload();
+            setupButtons();
+        }
+
+        // 模式选择
+        function setupModeSelector() {
+            elements.modeCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    elements.modeCards.forEach(c => c.classList.remove('active'));
+                    card.classList.add('active');
+                    state.mode = card.dataset.mode;
+
+                    // 显示/隐藏输入框
+                    elements.findInput.style.display = (state.mode === 'find') ? 'block' : 'none';
+                    elements.freeformInput.style.display = (state.mode === 'freeform') ? 'block' : 'none';
+
+                    showToast(`已切换到: ${card.querySelector('.mode-name').textContent}`, 'info');
+                });
+            });
+        }
+
+        // 上传设置
+        function setupUpload() {
+            elements.uploadArea.addEventListener('click', () => elements.fileInput.click());
+            elements.fileInput.addEventListener('change', handleFileSelect);
+            elements.removeBtn.addEventListener('click', clearImage);
+
+            // 拖拽
+            elements.uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                elements.uploadArea.classList.add('dragover');
+            });
+
+            elements.uploadArea.addEventListener('dragleave', () => {
+                elements.uploadArea.classList.remove('dragover');
+            });
+
+            elements.uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                elements.uploadArea.classList.remove('dragover');
+                if (e.dataTransfer.files.length) {
+                    handleFile(e.dataTransfer.files[0]);
+                }
+            });
+        }
+
+        // 处理文件选择
+        function handleFileSelect(e) {
+            if (e.target.files.length) {
+                handleFile(e.target.files[0]);
+            }
+        }
+
+        // 处理文件
+        function handleFile(file) {
+            if (!file.type.startsWith('image/')) {
+                showToast('请选择图片文件', 'error');
+                return;
+            }
+
+            if (file.size > CONFIG.maxFileSize) {
+                showToast('文件太大，请选择小于 10MB 的图片', 'error');
+                return;
+            }
+
+            state.image = file;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                state.imagePreview = e.target.result;
+                elements.previewImg.src = e.target.result;
+                elements.uploadArea.style.display = 'none';
+                elements.imagePreview.style.display = 'block';
+                elements.processBtn.disabled = false;
+                showToast('图片已上传', 'success');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // 清除图片
+        function clearImage() {
+            state.image = null;
+            state.imagePreview = null;
+            elements.uploadArea.style.display = 'block';
+            elements.imagePreview.style.display = 'none';
+            elements.previewImg.src = '';
+            elements.processBtn.disabled = true;
+            elements.fileInput.value = '';
+            elements.resultContent.innerHTML = `
+                <div class="empty-state">
+                    <span class="empty-icon">🎯</span>
+                    <div class="empty-text">准备就绪</div>
+                    <div class="empty-hint">上传图片并点击识别按钮开始处理</div>
+                </div>
+            `;
+            elements.resultActions.style.display = 'none';
+            showToast('图片已移除', 'info');
+        }
+
+        // 按钮设置
+        function setupButtons() {
+            elements.processBtn.addEventListener('click', processImage);
+            elements.copyBtn.addEventListener('click', copyResult);
+            elements.downloadBtn.addEventListener('click', downloadResult);
+        }
+
+        // 处理图片
+        async function processImage() {
+            if (!state.image || state.processing) return;
+
+            state.processing = true;
+            elements.processBtn.disabled = true;
+            elements.btnIcon.innerHTML = '<div class="loading-spinner"></div>';
+            elements.btnText.textContent = '识别中...';
+
+            elements.resultContent.innerHTML = `
+                <div class="empty-state">
+                    <span class="empty-icon">⏳</span>
+                    <div class="empty-text">AI 正在处理中...</div>
+                    <div class="empty-hint">请稍候，这可能需要几秒钟</div>
+                </div>
+            `;
+
+            try {
+                const formData = new FormData();
+                formData.append('file', state.image);
+                formData.append('prompt_type', state.mode);
+
+                if (state.mode === 'find') {
+                    formData.append('find_term', elements.findTerm.value || 'Total');
+                }
+
+                if (state.mode === 'freeform') {
+                    formData.append('custom_prompt', elements.customPrompt.value || 'OCR this image.');
+                }
+
+                formData.append('grounding', state.mode === 'find' || state.mode === 'document' || state.mode === 'ocr');
+
+                const response = await fetch(`${CONFIG.apiUrl}/ocr`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    displayResult(data);
+                    showToast('识别完成！', 'success');
+                } else {
+                    throw new Error(data.error || '识别失败');
+                }
+            } catch (error) {
+                elements.resultContent.innerHTML = `
+                    <div class="empty-state">
+                        <span class="empty-icon">❌</span>
+                        <div class="empty-text">识别失败</div>
+                        <div class="empty-hint">${error.message}</div>
+                    </div>
+                `;
+                showToast('识别失败: ' + error.message, 'error');
+            } finally {
+                state.processing = false;
+                elements.processBtn.disabled = false;
+                elements.btnIcon.textContent = '🚀';
+                elements.btnText.textContent = '开始识别';
+            }
+        }
+
+        // 显示结果
+        function displayResult(data) {
+            state.resultData = data;
+            
+            // 显示文本
+            const isHTML = data.text && (data.text.includes('<table') || data.text.includes('<div'));
+            elements.resultContent.innerHTML = isHTML 
+                ? data.text 
+                : `<pre style="white-space: pre-wrap; word-wrap: break-word;">${data.text}</pre>`;
+
+            elements.resultActions.style.display = 'flex';
+
+            // 绘制边界框
+            if (data.boxes && data.boxes.length > 0 && data.image_dims) {
+                drawBoundingBoxes(data.boxes, data.image_dims);
+            }
+        }
+
+        // 绘制边界框
+        function drawBoundingBoxes(boxes, imageDims) {
+            const canvas = elements.boxCanvas;
+            const img = elements.previewImg;
+            const ctx = canvas.getContext('2d');
+
+            // 等待图片加载
+            img.onload = () => {
+                canvas.width = img.offsetWidth;
+                canvas.height = img.offsetHeight;
+                
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                const scaleX = img.offsetWidth / imageDims.w;
+                const scaleY = img.offsetHeight / imageDims.h;
+
+                const colors = ['#00ff00', '#00ffff', '#ff00ff', '#ffff00', '#ff0066'];
+
+                boxes.forEach((box, idx) => {
+                    const [x1, y1, x2, y2] = box.box;
+                    const color = colors[idx % colors.length];
+
+                    const sx = x1 * scaleX;
+                    const sy = y1 * scaleY;
+                    const sw = (x2 - x1) * scaleX;
+                    const sh = (y2 - y1) * scaleY;
+
+                    // 绘制半透明填充
+                    ctx.fillStyle = color + '33';
+                    ctx.fillRect(sx, sy, sw, sh);
+
+                    // 绘制边框
+                    ctx.strokeStyle = color;
+                    ctx.lineWidth = 3;
+                    ctx.shadowColor = color;
+                    ctx.shadowBlur = 10;
+                    ctx.strokeRect(sx, sy, sw, sh);
+                    ctx.shadowBlur = 0;
+
+                    // 标签
+                    if (box.label) {
+                        ctx.font = 'bold 14px Inter';
+                        const metrics = ctx.measureText(box.label);
+                        const padding = 8;
+                        const labelHeight = 24;
+
+                        ctx.fillStyle = color;
+                        ctx.fillRect(sx, sy - labelHeight, metrics.width + padding * 2, labelHeight);
+
+                        ctx.fillStyle = '#000';
+                        ctx.fillText(box.label, sx + padding, sy - 7);
+                    }
+                });
+            };
+
+            if (img.complete) {
+                img.onload();
+            }
+        }
+
+        // 复制结果
+        function copyResult() {
+            if (state.resultData && state.resultData.text) {
+                navigator.clipboard.writeText(state.resultData.text);
+                showToast('已复制到剪贴板', 'success');
+            }
+        }
+
+        // 下载结果
+        function downloadResult() {
+            if (state.resultData && state.resultData.text) {
+                const blob = new Blob([state.resultData.text], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `deepseek-ocr-${Date.now()}.txt`;
+                a.click();
+                URL.revokeObjectURL(url);
+                showToast('文件已下载', 'success');
+            }
+        }
+
+        // Toast 通知
+        function showToast(message, type = 'info') {
+            elements.toast.textContent = message;
+            elements.toast.className = `toast ${type}`;
+            elements.toast.classList.add('show');
+            setTimeout(() => {
+                elements.toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // 启动
+        init();
+    </script>
+</body>
+</html>

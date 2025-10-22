@@ -2,7 +2,7 @@
 
 <div align="center">
 
-**🌐 [简体中文](./README.md) | [繁體中文](./README_zh-TW.md) | [English](./README_en.md) | [日本語](./README_ja.md)**
+**🌐 [English](./README.md) | [简体中文](./README_zh-CN.md) | [繁體中文](./README_zh-TW.md) | [日本語](./README_ja.md)**
 
 [![Version](https://img.shields.io/badge/version-v3.1-blue.svg)](./CHANGELOG.md)
 [![Docker](https://img.shields.io/badge/docker-supported-brightgreen.svg)](./docker-compose.yml)

@@ -1,0 +1,1635 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeepSeek OCR - 智能图像识别</title>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #8b5cf6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #1f2937;
+            --light: #f9fafb;
+            --border: #e5e7eb;
+            --text: #374151;
+            --text-light: #6b7280;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --radius: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeInDown 0.6s ease-out;
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 3em;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .header p {
+            color: rgba(255,255,255,0.9);
+            font-size: 1.2em;
+        }
+
+        /* Main Card */
+        .main-card {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            overflow: hidden;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        /* Mode Selector */
+        .mode-section {
+            padding: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .mode-title {
+            color: white;
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .mode-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+        }
+
+        .mode-option {
+            background: rgba(255,255,255,0.15);
+            border: 2px solid transparent;
+            padding: 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+
+        .mode-option:hover {
+            background: rgba(255,255,255,0.25);
+            transform: translateY(-2px);
+        }
+
+        .mode-option.active {
+            background: white;
+            border-color: white;
+            color: var(--primary);
+        }
+
+        .mode-icon {
+            font-size: 2em;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .mode-name {
+            font-weight: 600;
+            color: white;
+        }
+
+        .mode-option.active .mode-name {
+            color: var(--primary);
+        }
+
+        /* Upload Section */
+        .upload-section {
+            padding: 40px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .upload-area {
+            border: 3px dashed var(--border);
+            border-radius: var(--radius);
+            padding: 60px 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: var(--light);
+        }
+
+        .upload-area:hover, .upload-area.dragover {
+            border-color: var(--primary);
+            background: #eef2ff;
+        }
+
+        .upload-icon {
+            font-size: 4em;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .upload-text {
+            font-size: 1.2em;
+            color: var(--text);
+            margin-bottom: 10px;
+        }
+
+        .upload-hint {
+            color: var(--text-light);
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        /* Images Grid */
+        .images-section {
+            padding: 40px;
+            display: none;
+        }
+
+        .images-section.active {
+            display: block;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 1.5em;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .images-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .image-card {
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            cursor: move;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .image-card:hover {
+            box-shadow: 0 8px 24px var(--shadow);
+            transform: translateY(-4px);
+        }
+
+        .image-card.dragging {
+            opacity: 0.5;
+        }
+
+        .image-preview {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background: var(--light);
+        }
+
+        .image-info {
+            padding: 12px;
+        }
+
+        .image-name {
+            font-weight: 600;
+            font-size: 0.9em;
+            color: var(--dark);
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .image-size {
+            font-size: 0.85em;
+            color: var(--text-light);
+        }
+
+        .image-order {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: var(--primary);
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9em;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .image-remove {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--danger);
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .image-remove:hover {
+            background: #dc2626;
+            transform: scale(1.1);
+        }
+
+        .image-status {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 8px;
+            text-align: center;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .status-processing {
+            background: rgba(245, 158, 11, 0.9);
+        }
+
+        .status-completed {
+            background: rgba(16, 185, 129, 0.9);
+        }
+
+        .status-error {
+            background: rgba(239, 68, 68, 0.9);
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 14px 32px;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px var(--shadow);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background: var(--light);
+            color: var(--dark);
+            border: 2px solid var(--border);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        /* Progress Section */
+        .progress-section {
+            padding: 30px 40px;
+            background: var(--light);
+            display: none;
+        }
+
+        .progress-section.active {
+            display: block;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .progress-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .progress-stats {
+            display: flex;
+            gap: 20px;
+        }
+
+        .progress-stat {
+            font-size: 0.95em;
+            color: var(--text-light);
+        }
+
+        .progress-stat strong {
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .progress-bar-container {
+            background: white;
+            border-radius: 8px;
+            height: 12px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transition: width 0.3s;
+            border-radius: 8px;
+        }
+
+        /* Result Section */
+        .result-section {
+            padding: 40px;
+            display: none;
+        }
+
+        .result-section.active {
+            display: block;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .result-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .result-text {
+            background: var(--light);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+            font-size: 0.95em;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 600px;
+            overflow-y: auto;
+            color: var(--dark);
+        }
+
+        .result-empty {
+            text-align: center;
+            padding: 60px;
+            color: var(--text-light);
+        }
+
+        .result-empty-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: white;
+            padding: 16px 24px;
+            border-radius: var(--radius);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            display: none;
+            align-items: center;
+            gap: 12px;
+            z-index: 1000;
+            animation: slideIn 0.3s;
+        }
+
+        .toast.active {
+            display: flex;
+        }
+
+        .toast.success { border-left: 4px solid var(--success); }
+        .toast.error { border-left: 4px solid var(--danger); }
+        .toast.info { border-left: 4px solid var(--primary); }
+
+        .toast-icon {
+            font-size: 1.5em;
+        }
+
+        .toast-message {
+            font-weight: 500;
+        }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .spinning {
+            animation: spin 1s linear infinite;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .header p {
+                font-size: 1em;
+            }
+
+            .mode-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .upload-section,
+            .images-section,
+            .result-section {
+                padding: 20px;
+            }
+
+            .upload-area {
+                padding: 40px 20px;
+            }
+
+            .images-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 12px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .section-header,
+            .result-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .result-actions {
+                width: 100%;
+            }
+
+            .toast {
+                bottom: 20px;
+                right: 20px;
+                left: 20px;
+            }
+        }
+
+        /* Log Section */
+        .log-section {
+            padding: 40px;
+            background: var(--light);
+            border-top: 1px solid var(--border);
+            display: none;
+        }
+
+        .log-section.active {
+            display: block;
+        }
+
+        .log-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .log-title {
+            font-size: 1.5em;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .log-stats {
+            display: flex;
+            gap: 20px;
+            font-size: 0.9em;
+            color: var(--text-light);
+        }
+
+        .log-stat {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .log-container {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 16px;
+        }
+
+        .log-item {
+            padding: 12px 16px;
+            margin-bottom: 10px;
+            background: var(--light);
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+            animation: slideInLog 0.3s;
+            transition: all 0.3s;
+        }
+
+        .log-item:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .log-item.success {
+            border-left-color: var(--success);
+        }
+
+        .log-item.error {
+            border-left-color: var(--danger);
+        }
+
+        .log-item.warning {
+            border-left-color: var(--warning);
+        }
+
+        .log-item.info {
+            border-left-color: var(--primary);
+        }
+
+        .log-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .log-time {
+            color: var(--text-light);
+            font-size: 0.85em;
+            font-family: monospace;
+        }
+
+        .log-type {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75em;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .log-type.success { background: #d1fae5; color: #065f46; }
+        .log-type.error { background: #fee2e2; color: #991b1b; }
+        .log-type.warning { background: #fef3c7; color: #92400e; }
+        .log-type.info { background: #dbeafe; color: #1e40af; }
+
+        .log-message {
+            color: var(--dark);
+            line-height: 1.6;
+            font-size: 0.95em;
+        }
+
+        .log-detail {
+            margin-top: 6px;
+            padding: 8px 12px;
+            background: white;
+            border-radius: 6px;
+            font-size: 0.85em;
+            color: var(--text-light);
+            font-family: monospace;
+        }
+
+        @keyframes slideInLog {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--light);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #cbd5e1;
+        }
+
+        @media (max-width: 768px) {
+            .log-panel {
+                left: 10px;
+                right: 10px;
+                width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🔍 DeepSeek OCR</h1>
+            <p>智能图像识别 · 批量处理 · 多模式支持</p>
+        </div>
+
+        <!-- Main Card -->
+        <div class="main-card">
+            <!-- Mode Selection -->
+            <div class="mode-section">
+                <div class="mode-title">选择识别模式（增强版：新增 Find 和 Freeform）</div>
+                <div class="mode-grid">
+                    <div class="mode-option active" data-mode="document">
+                        <span class="mode-icon">📄</span>
+                        <div class="mode-name">文档转Markdown</div>
+                    </div>
+                    <div class="mode-option" data-mode="ocr">
+                        <span class="mode-icon">📝</span>
+                        <div class="mode-name">通用OCR</div>
+                    </div>
+                    <div class="mode-option" data-mode="free">
+                        <span class="mode-icon">📋</span>
+                        <div class="mode-name">纯文本提取</div>
+                    </div>
+                    <div class="mode-option" data-mode="figure">
+                        <span class="mode-icon">📊</span>
+                        <div class="mode-name">图表解析</div>
+                    </div>
+                    <div class="mode-option" data-mode="describe">
+                        <span class="mode-icon">🖼️</span>
+                        <div class="mode-name">图像描述</div>
+                    </div>
+                    <div class="mode-option" data-mode="find">
+                        <span class="mode-icon">🔍</span>
+                        <div class="mode-name">查找定位 (Find)</div>
+                    </div>
+                    <div class="mode-option" data-mode="freeform">
+                        <span class="mode-icon">✨</span>
+                        <div class="mode-name">自定义 (Freeform)</div>
+                    </div>
+                </div>
+                
+                <!-- Find Term Input -->
+                <div id="findTermInput" style="display: none; margin-top: 15px;">
+                    <input type="text" id="findTerm" placeholder="输入要查找的内容（如：Total, Invoice #）" 
+                           style="width: 100%; padding: 10px; border-radius: 8px; border: 2px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: white; font-size: 14px;">
+                    <div style="margin-top: 8px; color: rgba(255,255,255,0.8); font-size: 12px;">
+                        💡 提示：输入要在图片中查找并定位的内容，系统会标注出它的位置
+                    </div>
+                </div>
+                
+                <!-- Freeform Prompt Input -->
+                <div id="freeformInput" style="display: none; margin-top: 15px;">
+                    <textarea id="customPrompt" placeholder="输入自定义提示词（如：提取所有日期和金额）" 
+                              style="width: 100%; padding: 10px; border-radius: 8px; border: 2px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: white; font-size: 14px; min-height: 80px; resize: vertical;"></textarea>
+                    <div style="margin-top: 8px; color: rgba(255,255,255,0.8); font-size: 12px;">
+                        💡 提示：输入任何自定义的识别需求，系统会按照您的要求处理图片
+                    </div>
+                </div>
+            </div>
+
+            <!-- Upload Section -->
+            <div class="upload-section">
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">☁️</div>
+                    <div class="upload-text">拖拽图片到这里或点击上传</div>
+                    <div class="upload-hint">支持多张图片批量上传，可调整处理顺序</div>
+                    <input type="file" id="fileInput" multiple accept="image/*">
+                </div>
+            </div>
+
+            <!-- Images Grid Section -->
+            <div class="images-section" id="imagesSection">
+                <div class="section-header">
+                    <div class="section-title">已上传图片 (<span id="imageCount">0</span>)</div>
+                    <div style="color: var(--text-light); font-size: 0.9em;">💡 拖动图片可调整顺序</div>
+                </div>
+                <div class="images-grid" id="imagesGrid"></div>
+                <div class="action-buttons">
+                    <button class="btn btn-primary" id="processBtn">
+                        <span>🚀</span> 开始识别
+                    </button>
+                    <button class="btn btn-secondary" id="addMoreBtn">
+                        <span>➕</span> 继续添加
+                    </button>
+                    <button class="btn btn-danger" id="clearBtn">
+                        <span>🗑️</span> 清空全部
+                    </button>
+                </div>
+            </div>
+
+            <!-- Progress Section -->
+            <div class="progress-section" id="progressSection">
+                <div class="progress-header">
+                    <div class="progress-title">识别进度</div>
+                    <div class="progress-stats">
+                        <span class="progress-stat">已处理: <strong><span id="processedCount">0</span></strong></span>
+                        <span class="progress-stat">总计: <strong><span id="totalCount">0</span></strong></span>
+                    </div>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <!-- Result Section -->
+            <div class="result-section" id="resultSection">
+                <div class="result-header">
+                    <div class="section-title">识别结果</div>
+                    <div class="result-actions">
+                        <button class="btn btn-success" id="copyBtn">
+                            <span>📋</span> 复制文本
+                        </button>
+                        <button class="btn btn-primary" id="downloadBtn">
+                            <span>⬇️</span> 下载文本
+                        </button>
+                    </div>
+                </div>
+                <div class="result-text" id="resultText"></div>
+            </div>
+
+            <!-- Log Section -->
+            <div class="log-section" id="logSection">
+                <div class="log-header">
+                    <div class="log-title">📋 操作日志</div>
+                    <div class="log-stats">
+                        <div class="log-stat">
+                            <span>📊</span>
+                            <span>共 <strong id="logCount">0</strong> 条记录</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="log-container" id="logContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <span class="toast-icon" id="toastIcon">✓</span>
+        <span class="toast-message" id="toastMessage">操作成功</span>
+    </div>
+
+    <script>
+        // Configuration
+        const CONFIG = {
+            apiUrl: 'https://deepseek-ocr.aws.xin',
+            maxConcurrent: 1 // 逐一处理
+        };
+
+        // State
+        const state = {
+            mode: 'document',
+            images: [],
+            results: [],
+            isProcessing: false
+        };
+
+        // DOM Elements
+        const elements = {
+            uploadArea: document.getElementById('uploadArea'),
+            fileInput: document.getElementById('fileInput'),
+            imagesSection: document.getElementById('imagesSection'),
+            imagesGrid: document.getElementById('imagesGrid'),
+            imageCount: document.getElementById('imageCount'),
+            processBtn: document.getElementById('processBtn'),
+            addMoreBtn: document.getElementById('addMoreBtn'),
+            clearBtn: document.getElementById('clearBtn'),
+            progressSection: document.getElementById('progressSection'),
+            progressBar: document.getElementById('progressBar'),
+            processedCount: document.getElementById('processedCount'),
+            totalCount: document.getElementById('totalCount'),
+            resultSection: document.getElementById('resultSection'),
+            resultText: document.getElementById('resultText'),
+            copyBtn: document.getElementById('copyBtn'),
+            downloadBtn: document.getElementById('downloadBtn'),
+            toast: document.getElementById('toast'),
+            toastIcon: document.getElementById('toastIcon'),
+            toastMessage: document.getElementById('toastMessage'),
+            logSection: document.getElementById('logSection'),
+            logContent: document.getElementById('logContent'),
+            logCount: document.getElementById('logCount')
+        };
+
+        // Initialize
+        function init() {
+            setupModeSelector();
+            setupUpload();
+            setupButtons();
+            setupDragAndDrop();
+            
+            // 显示日志区域
+            elements.logSection.classList.add('active');
+            
+            // 初始化日志
+            addLog('系统初始化', 'info', '🚀 DeepSeek OCR 智能识别系统已就绪，欢迎使用！', {
+                '系统版本': 'v2.0',
+                '服务地址': CONFIG.apiUrl,
+                '支持格式': 'JPG, PNG, JPEG, BMP, GIF',
+                '识别模式': '5种模式可选'
+            });
+        }
+
+        // Add Log Entry (增强版)
+        function addLog(message, type = 'info', detail = '', extraData = null) {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('zh-CN', { 
+                hour12: false,
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                fractionalSecondDigits: 3
+            });
+
+            let extraHtml = '';
+            if (extraData) {
+                const extraItems = Object.entries(extraData).map(([key, value]) => 
+                    `${key}: ${value}`
+                ).join(' | ');
+                extraHtml = `<div class="log-detail">${extraItems}</div>`;
+            } else if (detail) {
+                extraHtml = `<div class="log-detail">${detail}</div>`;
+            }
+
+            const logItem = document.createElement('div');
+            logItem.className = `log-item ${type}`;
+            logItem.innerHTML = `
+                <div class="log-item-header">
+                    <span class="log-time">${timeStr}</span>
+                    <span class="log-type ${type}">${type}</span>
+                </div>
+                <div class="log-message">${message}</div>
+                ${extraHtml}
+            `;
+
+            elements.logContent.insertBefore(logItem, elements.logContent.firstChild);
+
+            // 更新日志计数
+            const logCount = elements.logContent.querySelectorAll('.log-item').length;
+            elements.logCount.textContent = logCount;
+
+            // 限制日志数量，最多保留100条
+            const logs = elements.logContent.querySelectorAll('.log-item');
+            if (logs.length > 100) {
+                logs[logs.length - 1].remove();
+            }
+
+            // 自动滚动到顶部显示最新日志
+            elements.logContent.scrollTop = 0;
+        }
+
+        // Mode Selector
+        function setupModeSelector() {
+            document.querySelectorAll('.mode-option').forEach(option => {
+                option.addEventListener('click', () => {
+                    const oldMode = state.mode;
+                    const newMode = option.dataset.mode;
+                    
+                    // 如果模式相同，不做任何操作
+                    if (oldMode === newMode) return;
+                    
+                    document.querySelectorAll('.mode-option').forEach(o => o.classList.remove('active'));
+                    option.classList.add('active');
+                    state.mode = newMode;
+                    const modeName = option.querySelector('.mode-name').textContent;
+                    
+                    // 显示/隐藏输入字段
+                    document.getElementById('findTermInput').style.display = (newMode === 'find') ? 'block' : 'none';
+                    document.getElementById('freeformInput').style.display = (newMode === 'freeform') ? 'block' : 'none';
+                    
+                    // 检查是否已经完成识别
+                    const hasCompletedImages = state.images.some(img => img.status === 'completed' || img.status === 'error');
+                    
+                    if (hasCompletedImages) {
+                        // 重置所有图片状态为待处理
+                        const completedCount = state.images.filter(img => img.status === 'completed').length;
+                        const errorCount = state.images.filter(img => img.status === 'error').length;
+                        
+                        state.images.forEach(img => {
+                            img.status = 'pending';
+                            img.result = null;
+                        });
+                        
+                        // 清空之前的识别结果
+                        state.results = [];
+                        
+                        // 隐藏进度和结果区域
+                        elements.progressSection.classList.remove('active');
+                        elements.resultSection.classList.remove('active');
+                        
+                        // 重新渲染图片（清除状态标签）
+                        renderImages();
+                        
+                        // 更新UI状态（使按钮可点击）
+                        updateUI();
+                        
+                        showToast(`已切换到: ${modeName}，可以重新识别`, 'info');
+                        addLog('切换识别模式', 'success', `从 [${getModeDisplayName(oldMode)}] 切换到 [${modeName}]，已重置识别状态`, {
+                            '新模式': modeName,
+                            '适用场景': getModeDescription(state.mode),
+                            '图片数量': `${state.images.length} 张`,
+                            '已重置': `${completedCount} 张已完成，${errorCount} 张失败`,
+                            '当前状态': '准备重新识别'
+                        });
+                    } else {
+                        showToast(`已切换到: ${modeName}`, 'info');
+                        addLog('切换识别模式', 'info', `从 [${getModeDisplayName(oldMode)}] 切换到 [${modeName}]`, {
+                            '当前模式': modeName,
+                            '适用场景': getModeDescription(state.mode)
+                        });
+                    }
+                });
+            });
+        }
+
+        function getModeDisplayName(mode) {
+            const names = {
+                'document': '文档转Markdown',
+                'ocr': '通用OCR',
+                'free': '纯文本提取',
+                'figure': '图表解析',
+                'describe': '图像描述',
+                'find': '查找定位 (Find)',
+                'freeform': '自定义 (Freeform)'
+            };
+            return names[mode] || mode;
+        }
+
+        function getModeDescription(mode) {
+            const descriptions = {
+                'document': '保留文档格式和布局',
+                'ocr': '提取所有可见文字',
+                'free': '纯文本不保留格式',
+                'figure': '识别图表公式等',
+                'describe': '生成详细图像描述',
+                'find': '查找并定位特定内容',
+                'freeform': '使用自定义提示词'
+            };
+            return descriptions[mode] || '未知';
+        }
+
+        // Upload Setup
+        function setupUpload() {
+            elements.uploadArea.addEventListener('click', () => {
+                elements.fileInput.click();
+            });
+
+            elements.fileInput.addEventListener('change', (e) => {
+                handleFiles(Array.from(e.target.files));
+                e.target.value = '';
+            });
+
+            // Drag and drop
+            elements.uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                elements.uploadArea.classList.add('dragover');
+            });
+
+            elements.uploadArea.addEventListener('dragleave', () => {
+                elements.uploadArea.classList.remove('dragover');
+            });
+
+            elements.uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                elements.uploadArea.classList.remove('dragover');
+                handleFiles(Array.from(e.dataTransfer.files));
+            });
+        }
+
+        // Handle Files
+        function handleFiles(files) {
+            const totalFiles = files.length;
+            const validFiles = files.filter(file => file.type.startsWith('image/'));
+            const invalidCount = totalFiles - validFiles.length;
+            
+            if (validFiles.length === 0) {
+                showToast('请选择有效的图片文件', 'error');
+                addLog('文件上传失败', 'error', '所有文件都不是有效的图片格式', {
+                    '尝试上传': `${totalFiles} 个文件`,
+                    '有效文件': '0 个',
+                    '支持格式': 'JPG, PNG, JPEG, BMP, GIF'
+                });
+                return;
+            }
+
+            const totalSize = validFiles.reduce((sum, f) => sum + f.size, 0);
+            addLog('开始上传图片', 'info', `正在处理 ${validFiles.length} 张图片...`, {
+                '有效文件': `${validFiles.length} 张`,
+                '无效文件': `${invalidCount} 个`,
+                '总大小': formatFileSize(totalSize),
+                '平均大小': formatFileSize(totalSize / validFiles.length)
+            });
+
+            let loadedCount = 0;
+            validFiles.forEach((file, index) => {
+                const id = Date.now() + Math.random();
+                const reader = new FileReader();
+                
+                reader.onload = (e) => {
+                    state.images.push({
+                        id,
+                        file,
+                        name: file.name,
+                        size: formatFileSize(file.size),
+                        preview: e.target.result,
+                        status: 'pending',
+                        result: null
+                    });
+                    renderImages();
+                    updateUI();
+                    
+                    loadedCount++;
+                    if (loadedCount === validFiles.length) {
+                        addLog('图片上传完成', 'success', `所有图片已加载到队列`, {
+                            '成功加载': `${validFiles.length} 张`,
+                            '当前队列': `${state.images.length} 张`,
+                            '识别模式': getModeDisplayName(state.mode)
+                        });
+                    }
+                };
+                
+                reader.onerror = () => {
+                    addLog(`图片加载失败`, 'error', `无法读取: ${file.name}`);
+                };
+                
+                reader.readAsDataURL(file);
+            });
+
+            showToast(`添加了 ${validFiles.length} 张图片`, 'success');
+        }
+
+        // Render Images
+        function renderImages() {
+            elements.imagesGrid.innerHTML = state.images.map((img, index) => `
+                <div class="image-card" draggable="true" data-id="${img.id}">
+                    <div class="image-order">${index + 1}</div>
+                    <button class="image-remove" onclick="removeImage('${img.id}')">×</button>
+                    <img src="${img.preview}" alt="${img.name}" class="image-preview">
+                    <div class="image-info">
+                        <div class="image-name" title="${img.name}">${img.name}</div>
+                        <div class="image-size">${img.size}</div>
+                    </div>
+                    ${img.status !== 'pending' ? `<div class="image-status status-${img.status}">${getStatusText(img.status)}</div>` : ''}
+                </div>
+            `).join('');
+
+            setupImageDragAndDrop();
+        }
+
+        // Setup Image Drag and Drop for Reordering (修复版)
+        function setupImageDragAndDrop() {
+            const cards = document.querySelectorAll('.image-card');
+            let draggedElement = null;
+            let draggedId = null;
+
+            cards.forEach(card => {
+                card.addEventListener('dragstart', (e) => {
+                    draggedElement = card;
+                    draggedId = card.dataset.id;
+                    const img = state.images.find(i => i.id == draggedId);
+                    card.classList.add('dragging');
+                    e.dataTransfer.effectAllowed = 'move';
+                    e.dataTransfer.setData('text/html', card.innerHTML);
+                    
+                    if (img) {
+                        const currentIndex = state.images.findIndex(i => i.id == draggedId);
+                        addLog('开始拖动图片', 'info', `正在调整 ${img.name} 的位置`, {
+                            '当前位置': `第 ${currentIndex + 1} 张`,
+                            '文件名': img.name
+                        });
+                    }
+                });
+
+                card.addEventListener('dragend', () => {
+                    card.classList.remove('dragging');
+                });
+
+                card.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'move';
+                    
+                    if (draggedElement && card !== draggedElement) {
+                        // 获取所有卡片
+                        const allCards = [...elements.imagesGrid.querySelectorAll('.image-card')];
+                        const draggedIndex = allCards.indexOf(draggedElement);
+                        const targetIndex = allCards.indexOf(card);
+                        
+                        // 判断应该插入到目标元素之前还是之后
+                        if (draggedIndex < targetIndex) {
+                            // 从前往后拖，插入到目标之后
+                            card.parentNode.insertBefore(draggedElement, card.nextSibling);
+                        } else {
+                            // 从后往前拖，插入到目标之前
+                            card.parentNode.insertBefore(draggedElement, card);
+                        }
+                    }
+                });
+
+                card.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    updateImageOrder();
+                });
+            });
+
+            // 为容器添加dragover事件，防止默认行为
+            elements.imagesGrid.addEventListener('dragover', (e) => {
+                e.preventDefault();
+            });
+        }
+
+        function updateImageOrder() {
+            const cards = [...document.querySelectorAll('.image-card')];
+            const newOrder = cards.map(card => card.dataset.id);
+            
+            // 保存旧顺序用于对比
+            const oldOrder = state.images.map(img => img.name);
+            
+            state.images.sort((a, b) => {
+                return newOrder.indexOf(a.id.toString()) - newOrder.indexOf(b.id.toString());
+            });
+            
+            const newOrderNames = state.images.map(img => img.name);
+            
+            renderImages();
+            
+            addLog('图片顺序已调整', 'success', `拖拽排序完成，已更新识别顺序`, {
+                '总数量': `${state.images.length} 张`,
+                '新顺序': newOrderNames.slice(0, 3).join(', ') + (newOrderNames.length > 3 ? '...' : ''),
+                '操作提示': '将按照新顺序进行识别'
+            });
+        }
+
+        // Remove Image
+        window.removeImage = function(id) {
+            state.images = state.images.filter(img => img.id != id);
+            renderImages();
+            updateUI();
+            showToast('已移除图片', 'info');
+        };
+
+        // Setup Buttons
+        function setupButtons() {
+            elements.processBtn.addEventListener('click', startProcessing);
+            elements.addMoreBtn.addEventListener('click', () => elements.fileInput.click());
+            elements.clearBtn.addEventListener('click', clearAll);
+            elements.copyBtn.addEventListener('click', copyResult);
+            elements.downloadBtn.addEventListener('click', downloadResult);
+        }
+
+        // Start Processing
+        async function startProcessing() {
+            if (state.images.length === 0) {
+                showToast('请先上传图片', 'error');
+                addLog('无法开始识别', 'error', '请先上传至少一张图片', {
+                    '当前队列': '0 张图片',
+                    '操作建议': '点击上传区域添加图片'
+                });
+                return;
+            }
+
+            const startTime = Date.now();
+            state.isProcessing = true;
+            state.results = [];
+            elements.progressSection.classList.add('active');
+            elements.resultSection.classList.remove('active');
+            updateUI();
+
+            addLog('开始批量识别', 'success', `准备处理 ${state.images.length} 张图片`, {
+                '图片数量': `${state.images.length} 张`,
+                '识别模式': getModeDisplayName(state.mode),
+                '处理方式': '逐一顺序处理',
+                '预计时间': `约 ${Math.ceil(state.images.length * 0.5)}-${state.images.length} 分钟`
+            });
+
+            const total = state.images.length;
+            let processed = 0;
+            let succeeded = 0;
+            let failed = 0;
+
+            for (let i = 0; i < state.images.length; i++) {
+                const image = state.images[i];
+                if (image.status === 'completed') continue;
+
+                const imageStartTime = Date.now();
+                image.status = 'processing';
+                renderImages();
+                
+                addLog(`识别图片 [${i + 1}/${total}]`, 'info', `正在处理: ${image.name}`, {
+                    '文件名': image.name,
+                    '文件大小': image.size,
+                    '当前位置': `第 ${i + 1} 张`,
+                    '队列进度': `${processed}/${total}`,
+                    '识别模式': getModeDisplayName(state.mode)
+                });
+
+                try {
+                    const result = await processImage(image);
+                    const processingTime = ((Date.now() - imageStartTime) / 1000).toFixed(1);
+                    
+                    image.status = 'completed';
+                    image.result = result;
+                    state.results.push({
+                        name: image.name,
+                        text: result
+                    });
+                    succeeded++;
+                    
+                    const textLength = result.length;
+                    const wordCount = result.split(/\s+/).length;
+                    
+                    addLog(`✓ 识别成功 [${i + 1}/${total}]`, 'success', `${image.name} 处理完成`, {
+                        '处理时间': `${processingTime} 秒`,
+                        '识别字符': `${textLength} 个字符`,
+                        '词数统计': `约 ${wordCount} 词`,
+                        '当前进度': `${Math.round((processed + 1) / total * 100)}%`,
+                        '剩余数量': `${total - processed - 1} 张`
+                    });
+                } catch (error) {
+                    const processingTime = ((Date.now() - imageStartTime) / 1000).toFixed(1);
+                    
+                    image.status = 'error';
+                    image.result = `识别失败: ${error.message}`;
+                    failed++;
+                    
+                    addLog(`✗ 识别失败 [${i + 1}/${total}]`, 'error', `${image.name} 处理出错`, {
+                        '错误信息': error.message,
+                        '处理时间': `${processingTime} 秒`,
+                        '文件名': image.name,
+                        '当前进度': `${Math.round((processed + 1) / total * 100)}%`,
+                        '建议': '检查图片格式或网络连接'
+                    });
+                }
+
+                processed++;
+                updateProgress(processed, total);
+                renderImages();
+            }
+
+            const totalTime = ((Date.now() - startTime) / 1000).toFixed(1);
+            const avgTime = (totalTime / total).toFixed(1);
+
+            state.isProcessing = false;
+            showResult();
+            showToast('所有图片识别完成！', 'success');
+            
+            addLog('批量识别完成', 'success', `所有图片处理完毕，结果已生成`, {
+                '总数量': `${total} 张`,
+                '成功': `${succeeded} 张`,
+                '失败': `${failed} 张`,
+                '总耗时': `${totalTime} 秒`,
+                '平均耗时': `${avgTime} 秒/张`,
+                '识别模式': getModeDisplayName(state.mode),
+                '结果长度': `${state.results.reduce((sum, r) => sum + r.text.length, 0)} 字符`
+            });
+        }
+
+        // Process Single Image
+        async function processImage(image) {
+            const formData = new FormData();
+            formData.append('file', image.file);
+            formData.append('prompt_type', state.mode);
+            
+            // 添加 Find 模式的查找词
+            if (state.mode === 'find') {
+                const findTerm = document.getElementById('findTerm').value.trim();
+                formData.append('find_term', findTerm || 'Total');
+            }
+            
+            // 添加 Freeform 模式的自定义提示
+            if (state.mode === 'freeform') {
+                const customPrompt = document.getElementById('customPrompt').value.trim();
+                formData.append('custom_prompt', customPrompt || 'OCR this image.');
+            }
+            
+            // 可选：添加 grounding 参数
+            formData.append('grounding', state.mode === 'find' || state.mode === 'document' || state.mode === 'ocr');
+
+            const response = await fetch(`${CONFIG.apiUrl}/ocr`, {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (!data.success) {
+                throw new Error(data.error || '识别失败');
+            }
+            
+            // 如果有 boxes 信息，保存到 image 对象中
+            if (data.boxes && data.boxes.length > 0) {
+                image.boxes = data.boxes;
+                image.imageDims = data.image_dims;
+            }
+
+            return data.text;
+        }
+
+        // Update Progress
+        function updateProgress(processed, total) {
+            const percentage = (processed / total) * 100;
+            elements.progressBar.style.width = `${percentage}%`;
+            elements.processedCount.textContent = processed;
+            elements.totalCount.textContent = total;
+        }
+
+        // Show Result
+        function showResult() {
+            elements.resultSection.classList.add('active');
+            
+            if (state.results.length === 0) {
+                elements.resultText.innerHTML = `
+                    <div class="result-empty">
+                        <div class="result-empty-icon">📭</div>
+                        <div>暂无识别结果</div>
+                    </div>
+                `;
+                return;
+            }
+
+            // Merge results with separators
+            const mergedText = state.results.map((result, index) => {
+                const separator = '='.repeat(60);
+                return `${separator}\n图片 ${index + 1}: ${result.name}\n${separator}\n\n${result.text}\n\n`;
+            }).join('\n');
+
+            elements.resultText.textContent = mergedText;
+        }
+
+        // Copy Result
+        function copyResult() {
+            const text = elements.resultText.textContent;
+            if (!text || text.includes('暂无识别结果')) {
+                showToast('没有可复制的内容', 'error');
+                addLog('复制操作失败', 'error', '当前没有可复制的识别结果', {
+                    '原因': '未进行识别或识别未完成',
+                    '建议': '先上传图片并完成识别'
+                });
+                return;
+            }
+
+            navigator.clipboard.writeText(text).then(() => {
+                const charCount = text.length;
+                const lineCount = text.split('\n').length;
+                
+                showToast('已复制到剪贴板', 'success');
+                addLog('复制到剪贴板', 'success', `识别结果已成功复制`, {
+                    '字符数': `${charCount} 个字符`,
+                    '行数': `${lineCount} 行`,
+                    '图片数': `${state.results.length} 张`,
+                    '操作': '可直接粘贴到其他应用'
+                });
+            }).catch((err) => {
+                showToast('复制失败', 'error');
+                addLog('复制操作失败', 'error', '无法访问剪贴板', {
+                    '错误': err.message || '浏览器安全限制',
+                    '建议': '尝试手动选择并复制文本'
+                });
+            });
+        }
+
+        // Download Result
+        function downloadResult() {
+            const text = elements.resultText.textContent;
+            if (!text || text.includes('暂无识别结果')) {
+                showToast('没有可下载的内容', 'error');
+                addLog('下载操作失败', 'error', '当前没有可下载的识别结果', {
+                    '原因': '未进行识别或识别未完成',
+                    '建议': '先上传图片并完成识别'
+                });
+                return;
+            }
+
+            const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            const filename = `OCR_结果_${new Date().toISOString().slice(0,10)}.txt`;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+
+            const fileSize = formatFileSize(blob.size);
+            const charCount = text.length;
+            const lineCount = text.split('\n').length;
+
+            showToast('文件已下载', 'success');
+            addLog('下载识别结果', 'success', `文件已保存到本地`, {
+                '文件名': filename,
+                '文件大小': fileSize,
+                '字符数': `${charCount} 个字符`,
+                '行数': `${lineCount} 行`,
+                '包含图片': `${state.results.length} 张`,
+                '保存位置': '浏览器默认下载文件夹'
+            });
+        }
+
+        // Clear All
+        function clearAll() {
+            if (!confirm('确定要清空所有图片吗？')) return;
+
+            const count = state.images.length;
+            const resultCount = state.results.length;
+            const completedCount = state.images.filter(i => i.status === 'completed').length;
+            
+            state.images = [];
+            state.results = [];
+            renderImages();
+            updateUI();
+            elements.progressSection.classList.remove('active');
+            elements.resultSection.classList.remove('active');
+            showToast('已清空', 'info');
+            
+            addLog('清空队列', 'info', `已清空所有图片和结果`, {
+                '清空图片': `${count} 张`,
+                '已完成': `${completedCount} 张`,
+                '识别结果': `${resultCount} 条`,
+                '当前状态': '队列已清空，可重新上传'
+            });
+        }
+
+        // Update UI
+        function updateUI() {
+            const hasImages = state.images.length > 0;
+            elements.imagesSection.classList.toggle('active', hasImages);
+            elements.imageCount.textContent = state.images.length;
+            elements.processBtn.disabled = state.isProcessing || !hasImages;
+            elements.clearBtn.disabled = state.isProcessing || !hasImages;
+        }
+
+        // Setup Drag and Drop (not for reordering, but for new file drop)
+        function setupDragAndDrop() {
+            // Already handled in setupUpload
+        }
+
+        // Utility Functions
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+
+        function getStatusText(status) {
+            const texts = {
+                pending: '等待中',
+                processing: '⚙️ 识别中...',
+                completed: '✅ 已完成',
+                error: '❌ 失败'
+            };
+            return texts[status] || status;
+        }
+
+        function showToast(message, type = 'info') {
+            const icons = {
+                success: '✓',
+                error: '✕',
+                info: 'ℹ'
+            };
+
+            elements.toastIcon.textContent = icons[type] || icons.info;
+            elements.toastMessage.textContent = message;
+            elements.toast.className = `toast ${type} active`;
+
+            setTimeout(() => {
+                elements.toast.classList.remove('active');
+            }, 3000);
+        }
+
+        // Initialize app
+        init();
+    </script>
+</body>
+</html>
