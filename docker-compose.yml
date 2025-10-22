@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  deepseek-ocr-webui:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: deepseek-ocr-webui
+    image: deepseek-ocr-webui:latest
+    
+    # GPU 配置
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    
+    # 端口映射 - 开放所有 IP 访问
+    ports:
+      - "0.0.0.0:8001:8001"
+    
+    # 环境变量
+    environment:
+      - CUDA_VISIBLE_DEVICES=0
+      - VLLM_USE_V1=0
+      - PYTHONUNBUFFERED=1
+    
+    # 挂载卷（用于模型缓存）
+    volumes:
+      - ./models:/root/.cache/huggingface
+      - ./logs:/app/logs
+    
+    # 共享内存大小（vLLM 需要）
+    shm_size: "8g"
+    
+    # 重启策略
+    restart: unless-stopped
+    
+    # 健康检查
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5m
+    
+    # 资源限制
+    mem_limit: 32g
+    memswap_limit: 32g
+    
+    # 网络模式
+    networks:
+      - ocr-network
+
+networks:
+  ocr-network:
+    driver: bridge

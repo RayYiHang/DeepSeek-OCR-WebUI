@@ -1,38 +1,83 @@
 #!/usr/bin/env python3
 """
-DeepSeek-OCR Web Service
-基于FastAPI和vLLM的OCR Web服务
+DeepSeek-OCR Web Service - 增强版
+基于 transformers 的稳定实现（替代 vLLM）
+集成了 Find 和 Freeform 功能
 """
-import asyncio
 import os
 import re
-import base64
-import io
 import tempfile
-from typing import Optional
+import shutil
+from typing import Optional, List, Dict, Any
+from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import FastAPI, File, UploadFile, Form, HTTPException, Header, Depends
+from fastapi import FastAPI, File, UploadFile, Form, HTTPException
 from fastapi.responses import JSONResponse, HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from PIL import Image, ImageOps
+import torch
+from transformers import AutoModel, AutoTokenizer
 import uvicorn
 
-# 设置环境变量
-os.environ['VLLM_USE_V1'] = '0'
-os.environ["CUDA_VISIBLE_DEVICES"] = '0'
+# 全局变量
+model = None
+tokenizer = None
+MODEL_PATH = 'deepseek-ai/DeepSeek-OCR'
 
-# 延迟导入vLLM相关模块
-vllm_loaded = False
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """模型加载生命周期"""
+    global model, tokenizer
+    
+    print("="*50)
+    print("🚀 DeepSeek-OCR 增强版启动中...")
+    print("="*50)
+    
+    try:
+        print(f"📦 正在加载模型: {MODEL_PATH}")
+        
+        # 加载 tokenizer
+        tokenizer = AutoTokenizer.from_pretrained(
+            MODEL_PATH,
+            trust_remote_code=True,
+        )
+        
+        # 加载模型
+        model = AutoModel.from_pretrained(
+            MODEL_PATH,
+            trust_remote_code=True,
+            use_safetensors=True,
+            attn_implementation="eager",
+            torch_dtype=torch.bfloat16,
+        ).eval().to("cuda")
+        
+        # 设置 pad token
+        if getattr(tokenizer, "pad_token_id", None) is None and getattr(tokenizer, "eos_token_id", None) is not None:
+            tokenizer.pad_token = tokenizer.eos_token
+        if getattr(model.config, "pad_token_id", None) is None and getattr(tokenizer, "pad_token_id", None) is not None:
+            model.config.pad_token_id = tokenizer.pad_token_id
+        
+        print("✅ 模型加载成功！")
+        print("="*50)
+        
+    except Exception as e:
+        print(f"❌ 模型加载失败: {e}")
+        raise
+    
+    yield
+    
+    print("🛑 服务关闭中...")
 
+# FastAPI 应用
 app = FastAPI(
-    title="DeepSeek-OCR API",
-    description="光学字符识别Web服务（开放访问）",
-    version="1.0.0"
+    title="DeepSeek-OCR API - 增强版",
+    description="智能 OCR 识别服务 · Find & Freeform 支持",
+    version="3.0.0",
+    lifespan=lifespan
 )
 
-# 添加CORS支持
+# CORS 中间件
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -41,370 +86,243 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# 移除了API Key验证 - 服务现在开放访问
-
-# 全局变量
-engine = None
-MODEL_PATH = 'deepseek-ai/DeepSeek-OCR'
-BASE_SIZE = 1024
-IMAGE_SIZE = 640
-CROP_MODE = True
-
-# vLLM相关类的全局引用
-AsyncLLMEngine = None
-SamplingParams = None
-AsyncEngineArgs = None
-DeepseekOCRProcessor = None
-NoRepeatNGramLogitsProcessor = None
-
-def load_vllm_engine():
-    """延迟加载vLLM引擎"""
-    global engine, vllm_loaded, AsyncLLMEngine, SamplingParams, AsyncEngineArgs
-    global DeepseekOCRProcessor, NoRepeatNGramLogitsProcessor
+def build_prompt(
+    mode: str,
+    custom_prompt: str = "",
+    find_term: str = "",
+    grounding: bool = False
+) -> str:
+    """构建提示词"""
     
-    if vllm_loaded:
-        return
+    # 模式映射
+    prompt_templates = {
+        "document": "<image>\n<|grounding|>Convert the document to markdown.",
+        "ocr": "<image>\n<|grounding|>OCR this image.",
+        "free": "<image>\nFree OCR. Only output the raw text.",
+        "figure": "<image>\nParse the figure.",
+        "describe": "<image>\nDescribe this image in detail.",
+        "find": "<image>\n<|grounding|>Locate <|ref|>{term}<|/ref|> in the image.",
+        "freeform": "<image>\n{prompt}",
+    }
     
-    try:
-        from vllm import AsyncLLMEngine as _AsyncLLMEngine
-        from vllm import SamplingParams as _SamplingParams
-        from vllm.engine.arg_utils import AsyncEngineArgs as _AsyncEngineArgs
-        from vllm.model_executor.models.registry import ModelRegistry
-        import sys
-        sys.path.insert(0, str(Path(__file__).parent / "DeepSeek-OCR-master/DeepSeek-OCR-vllm"))
-        from deepseek_ocr import DeepseekOCRForCausalLM
-        from process.image_process import DeepseekOCRProcessor as _DeepseekOCRProcessor
-        from process.ngram_norepeat import NoRepeatNGramLogitsProcessor as _NoRepeatNGramLogitsProcessor
-        
-        # 赋值给全局变量
-        AsyncLLMEngine = _AsyncLLMEngine
-        SamplingParams = _SamplingParams
-        AsyncEngineArgs = _AsyncEngineArgs
-        DeepseekOCRProcessor = _DeepseekOCRProcessor
-        NoRepeatNGramLogitsProcessor = _NoRepeatNGramLogitsProcessor
-        
-        # 注册模型
-        ModelRegistry.register_model("DeepseekOCRForCausalLM", DeepseekOCRForCausalLM)
-        
-        vllm_loaded = True
-        print("✓ vLLM引擎模块加载成功")
-        
-    except Exception as e:
-        print(f"✗ vLLM引擎加载失败: {e}")
-        raise
-
-
-def load_image(image_data):
-    """加载并处理图像"""
-    try:
-        image = Image.open(io.BytesIO(image_data))
-        corrected_image = ImageOps.exif_transpose(image)
-        return corrected_image.convert('RGB')
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=f"图像加载失败: {str(e)}")
-
-
-async def process_ocr(image: Image.Image, prompt: str) -> str:
-    """执行OCR处理"""
-    global engine
-    
-    # 如果引擎还未初始化，先初始化
-    if engine is None:
-        load_vllm_engine()
-        engine_args = AsyncEngineArgs(
-            model=MODEL_PATH,
-            hf_overrides={"architectures": ["DeepseekOCRForCausalLM"]},
-            block_size=256,
-            max_model_len=8192,
-            enforce_eager=False,
-            trust_remote_code=True,
-            tensor_parallel_size=1,
-            gpu_memory_utilization=0.6,
-        )
-        engine = AsyncLLMEngine.from_engine_args(engine_args)
-        print("✓ vLLM引擎初始化成功")
-    
-    # 处理图像
-    if '<image>' in prompt:
-        image_features = DeepseekOCRProcessor().tokenize_with_images(
-            images=[image], 
-            bos=True, 
-            eos=True, 
-            cropping=CROP_MODE
-        )
+    # 构建最终 prompt
+    if mode == "find":
+        term = find_term.strip() or "Total"
+        prompt = prompt_templates["find"].replace("{term}", term)
+    elif mode == "freeform":
+        user_prompt = custom_prompt.strip() or "OCR this image."
+        prompt = prompt_templates["freeform"].replace("{prompt}", user_prompt)
     else:
-        image_features = ''
+        prompt = prompt_templates.get(mode, prompt_templates["document"])
     
-    # 设置采样参数
-    logits_processors = [NoRepeatNGramLogitsProcessor(
-        ngram_size=30, 
-        window_size=90, 
-        whitelist_token_ids={128821, 128822}
-    )]
+    return prompt
+
+def clean_grounding_text(text: str) -> str:
+    """移除 grounding 标记"""
+    cleaned = re.sub(
+        r"<\|ref\|>(.*?)<\|/ref\|>\s*<\|det\|>\s*\[.*?\]\s*<\|/det\|>",
+        r"\1",
+        text,
+        flags=re.DOTALL,
+    )
+    cleaned = re.sub(r"<\|grounding\|>", "", cleaned)
+    return cleaned.strip()
+
+def parse_detections(text: str, image_width: int, image_height: int) -> List[Dict[str, Any]]:
+    """解析边界框坐标"""
+    boxes = []
     
-    sampling_params = SamplingParams(
-        temperature=0.0,
-        max_tokens=8192,
-        logits_processors=logits_processors,
-        skip_special_tokens=False,
+    DET_BLOCK = re.compile(
+        r"<\|ref\|>(?P<label>.*?)<\|/ref\|>\s*<\|det\|>\s*(?P<coords>\[.*?\])\s*<\|/det\|>",
+        re.DOTALL,
     )
     
-    # 生成请求
-    import time
-    request_id = f"request-{int(time.time())}-{id(image)}"
+    for m in DET_BLOCK.finditer(text or ""):
+        label = m.group("label").strip()
+        coords_str = m.group("coords").strip()
+        
+        try:
+            import ast
+            parsed = ast.literal_eval(coords_str)
+            
+            # 标准化为列表的列表
+            if isinstance(parsed, list) and len(parsed) == 4 and all(isinstance(n, (int, float)) for n in parsed):
+                box_coords = [parsed]
+            elif isinstance(parsed, list):
+                box_coords = parsed
+            else:
+                continue
+            
+            # 处理每个 box
+            for box in box_coords:
+                if isinstance(box, (list, tuple)) and len(box) >= 4:
+                    # 从 0-999 归一化坐标转换为实际像素坐标
+                    x1 = int(float(box[0]) / 999 * image_width)
+                    y1 = int(float(box[1]) / 999 * image_height)
+                    x2 = int(float(box[2]) / 999 * image_width)
+                    y2 = int(float(box[3]) / 999 * image_height)
+                    boxes.append({"label": label, "box": [x1, y1, x2, y2]})
+        except Exception as e:
+            print(f"❌ 解析坐标失败: {e}")
+            continue
     
-    if image_features and '<image>' in prompt:
-        request = {
-            "prompt": prompt,
-            "multi_modal_data": {"image": image_features}
-        }
-    else:
-        request = {"prompt": prompt}
-    
-    # 执行推理
-    result_text = ""
-    async for request_output in engine.generate(request, sampling_params, request_id):
-        if request_output.outputs:
-            result_text = request_output.outputs[0].text
-    
-    return result_text
-
+    return boxes
 
 @app.get("/", response_class=HTMLResponse)
 async def root():
-    """返回现代化OCR Web界面"""
-    # 读取优化后的UI界面文件
+    """返回 Web UI"""
     ui_file_path = Path(__file__).parent / "ocr_ui_modern.html"
     
     if ui_file_path.exists():
         with open(ui_file_path, 'r', encoding='utf-8') as f:
             return HTMLResponse(content=f.read())
     
-    # 如果文件不存在，返回备用HTML
-    html_content = """
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>DeepSeek-OCR Web服务</title>
-        <meta charset="utf-8">
-        <style>
-            body {
-                font-family: Arial, sans-serif;
-                max-width: 800px;
-                margin: 50px auto;
-                padding: 20px;
-                background-color: #f5f5f5;
-            }
-            .container {
-                background-color: white;
-                padding: 30px;
-                border-radius: 10px;
-                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            }
-            h1 {
-                color: #333;
-                text-align: center;
-            }
-            .upload-form {
-                margin-top: 30px;
-            }
-            label {
-                display: block;
-                margin-bottom: 5px;
-                font-weight: bold;
-                color: #555;
-            }
-            input[type="file"], select {
-                width: 100%;
-                padding: 10px;
-                margin-bottom: 20px;
-                border: 1px solid #ddd;
-                border-radius: 5px;
-            }
-            button {
-                width: 100%;
-                padding: 12px;
-                background-color: #4CAF50;
-                color: white;
-                border: none;
-                border-radius: 5px;
-                cursor: pointer;
-                font-size: 16px;
-            }
-            button:hover {
-                background-color: #45a049;
-            }
-            #result {
-                margin-top: 30px;
-                padding: 20px;
-                background-color: #f9f9f9;
-                border-radius: 5px;
-                display: none;
-            }
-            #result pre {
-                white-space: pre-wrap;
-                word-wrap: break-word;
-            }
-            .loading {
-                text-align: center;
-                display: none;
-            }
-            .info {
-                background-color: #e7f3fe;
-                border-left: 4px solid #2196F3;
-                padding: 10px;
-                margin-bottom: 20px;
-            }
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <h1>🔍 DeepSeek-OCR 文字识别服务</h1>
-            
-            <div class="info">
-                <strong>🌐 服务状态：</strong> 开放访问<br>
-                <strong>支持的功能：</strong><br>
-                • 文档转Markdown格式<br>
-                • 通用图像OCR<br>
-                • 图表解析<br>
-                • 详细图像描述
-            </div>
-            
-            <form class="upload-form" id="uploadForm">
-                <label>选择图片：</label>
-                <input type="file" id="imageFile" accept="image/*" required>
-                
-                <label>识别模式：</label>
-                <select id="promptType">
-                    <option value="document">文档转Markdown</option>
-                    <option value="ocr">通用OCR</option>
-                    <option value="free">纯文本OCR（无布局）</option>
-                    <option value="figure">图表解析</option>
-                    <option value="describe">详细描述图像</option>
-                </select>
-                
-                <button type="submit">开始识别</button>
-            </form>
-            
-            <div class="loading" id="loading">
-                <p>⏳ 正在识别中，请稍候...</p>
-            </div>
-            
-            <div id="result">
-                <h3>识别结果：</h3>
-                <pre id="resultText"></pre>
-            </div>
-        </div>
-        
-        <script>
-            document.getElementById('uploadForm').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                
-                const fileInput = document.getElementById('imageFile');
-                const promptType = document.getElementById('promptType').value;
-                const loading = document.getElementById('loading');
-                const result = document.getElementById('result');
-                
-                if (!fileInput.files[0]) {
-                    alert('请选择图片文件');
-                    return;
-                }
-                
-                const formData = new FormData();
-                formData.append('file', fileInput.files[0]);
-                formData.append('prompt_type', promptType);
-                
-                loading.style.display = 'block';
-                result.style.display = 'none';
-                
-                try {
-                    const response = await fetch('/ocr', {
-                        method: 'POST',
-                        body: formData
-                    });
-                    
-                    const data = await response.json();
-                    
-                    if (data.success) {
-                        document.getElementById('resultText').textContent = data.text;
-                        result.style.display = 'block';
-                    } else {
-                        alert('识别失败: ' + data.error);
-                    }
-                } catch (error) {
-                    alert('请求失败: ' + error.message);
-                } finally {
-                    loading.style.display = 'none';
-                }
-            });
-        </script>
-    </body>
-    </html>
-    """
-    return HTMLResponse(content=html_content)
+    return HTMLResponse(content="<h1>DeepSeek-OCR Web UI</h1><p>UI file not found</p>")
 
+@app.get("/health")
+async def health_check():
+    """健康检查"""
+    return {
+        "status": "healthy",
+        "model": MODEL_PATH,
+        "engine": "transformers",
+        "model_loaded": model is not None,
+        "gpu_available": torch.cuda.is_available(),
+        "gpu_count": torch.cuda.device_count() if torch.cuda.is_available() else 0
+    }
 
 @app.post("/ocr")
 async def ocr_endpoint(
     file: UploadFile = File(...),
-    prompt_type: str = Form("document")
+    prompt_type: str = Form("document"),
+    find_term: str = Form(""),
+    custom_prompt: str = Form(""),
+    grounding: bool = Form(False)
 ):
-    """OCR识别接口"""
+    """OCR 识别接口 - 增强版支持 Find 和 Freeform"""
     
-    # 根据prompt类型选择提示词
-    prompt_templates = {
-        "document": "<image>\n<|grounding|>Convert the document to markdown.",
-        "ocr": "<image>\n<|grounding|>OCR this image.",
-        "free": "<image>\nFree OCR.",
-        "figure": "<image>\nParse the figure.",
-        "describe": "<image>\nDescribe this image in detail.",
-    }
+    if model is None or tokenizer is None:
+        raise HTTPException(status_code=503, detail="模型未加载")
     
-    prompt = prompt_templates.get(prompt_type, prompt_templates["document"])
+    tmp_file = None
+    output_dir = None
     
     try:
-        # 读取上传的图片
+        # 读取上传的图片数据
         image_data = await file.read()
-        image = load_image(image_data)
         
-        # 执行OCR
-        result_text = await process_ocr(image, prompt)
+        # 保存到临时文件
+        with tempfile.NamedTemporaryFile(delete=False, suffix='.png', mode='wb') as tmp:
+            tmp.write(image_data)
+            tmp_file = tmp.name
         
-        # 清理结果
-        # 移除grounding标记
-        pattern = r'(<\|ref\|>(.*?)<\|/ref\|><\|det\|>(.*?)<\|/det\|>)'
-        matches = re.findall(pattern, result_text, re.DOTALL)
-        for match in matches:
-            result_text = result_text.replace(match[0], '')
+        print(f"📸 临时文件已保存: {tmp_file}")
+        
+        # 读取图片获取尺寸
+        try:
+            with Image.open(tmp_file) as img:
+                img = ImageOps.exif_transpose(img)
+                img = img.convert('RGB')
+                orig_w, orig_h = img.size
+                print(f"📐 图片尺寸: {orig_w}x{orig_h}")
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=f"图片加载失败: {str(e)}")
+        
+        # 构建 prompt
+        prompt = build_prompt(prompt_type, custom_prompt, find_term, grounding)
+        print(f"💬 提示词: {prompt[:100]}...")
+        
+        # 创建输出目录
+        output_dir = tempfile.mkdtemp(prefix="ocr_")
+        
+        # 执行推理
+        print(f"🚀 开始推理...")
+        result = model.infer(
+            tokenizer,
+            prompt=prompt,
+            image_file=tmp_file,
+            output_path=output_dir,
+            base_size=1024,
+            image_size=640,
+            crop_mode=True,
+            save_results=False,
+            test_compress=False,
+            eval_mode=True,
+        )
+        
+        print(f"✅ 推理完成，结果类型: {type(result)}")
+        
+        # 处理结果
+        if isinstance(result, str):
+            text = result.strip()
+        elif isinstance(result, dict) and "text" in result:
+            text = str(result["text"]).strip()
+        else:
+            text = str(result).strip()
+        
+        # 如果没有结果，检查输出文件
+        if not text:
+            result_file = os.path.join(output_dir, "result.mmd")
+            if os.path.exists(result_file):
+                with open(result_file, 'r', encoding='utf-8') as f:
+                    text = f.read().strip()
+        
+        if not text:
+            text = "模型未返回结果"
+        
+        print(f"📝 结果长度: {len(text)} 字符")
+        
+        # 解析 grounding boxes
+        boxes = []
+        if "<|det|>" in text or "<|ref|>" in text:
+            boxes = parse_detections(text, orig_w, orig_h)
+            print(f"📦 找到 {len(boxes)} 个边界框")
+        
+        # 清理显示文本
+        display_text = clean_grounding_text(text)
+        
+        if not display_text and boxes:
+            display_text = ", ".join([b["label"] for b in boxes])
         
         return JSONResponse({
             "success": True,
-            "text": result_text,
-            "prompt_type": prompt_type
+            "text": display_text,
+            "raw_text": text,
+            "boxes": boxes,
+            "image_dims": {"w": orig_w, "h": orig_h},
+            "prompt_type": prompt_type,
+            "metadata": {
+                "mode": prompt_type,
+                "grounding": grounding or (prompt_type in ["find", "document", "ocr"]),
+                "has_boxes": len(boxes) > 0,
+                "engine": "transformers"
+            }
         })
         
     except Exception as e:
+        import traceback
+        error_detail = traceback.format_exc()
+        print(f"❌ 错误详情:\n{error_detail}")
         return JSONResponse({
             "success": False,
             "error": str(e)
         }, status_code=500)
-
-
-@app.get("/health")
-async def health_check():
-    """健康检查接口（无需认证）"""
-    return {
-        "status": "healthy",
-        "model": MODEL_PATH,
-        "engine_loaded": engine is not None,
-        "authentication": "disabled"
-    }
-
+        
+    finally:
+        # 清理临时文件
+        if tmp_file and os.path.exists(tmp_file):
+            try:
+                os.remove(tmp_file)
+                print(f"🗑️ 临时文件已删除: {tmp_file}")
+            except Exception as e:
+                print(f"⚠️ 删除临时文件失败: {e}")
+        if output_dir and os.path.exists(output_dir):
+            shutil.rmtree(output_dir, ignore_errors=True)
+            print(f"🗑️ 输出目录已清理: {output_dir}")
 
 if __name__ == "__main__":
     import sys
     
-    # 可以通过命令行参数指定端口
     port = 8001
     if len(sys.argv) > 1:
         try:
@@ -412,22 +330,12 @@ if __name__ == "__main__":
         except:
             port = 8001
     
+    print("\n" + "="*50)
+    print("🚀 DeepSeek-OCR 增强版 Web 服务")
     print("="*50)
-    print("DeepSeek-OCR Web服务启动中...")
-    print("="*50)
-    
-    # 预加载vLLM模块（但不初始化引擎）
-    try:
-        load_vllm_engine()
-        print("✓ 模块加载完成")
-    except Exception as e:
-        print(f"✗ 模块加载失败: {e}")
-        print("提示: 引擎将在首次请求时初始化")
-    
-    print("\n服务信息:")
-    print(f"- 访问地址: http://0.0.0.0:{port}")
-    print(f"- API文档: http://0.0.0.0:{port}/docs")
-    print(f"- 健康检查: http://0.0.0.0:{port}/health")
-    print("="*50)
+    print(f"📍 访问地址: http://0.0.0.0:{port}")
+    print(f"📚 API 文档: http://0.0.0.0:{port}/docs")
+    print(f"❤️ 健康检查: http://0.0.0.0:{port}/health")
+    print("="*50 + "\n")
     
     uvicorn.run(app, host="0.0.0.0", port=port, log_level="info")

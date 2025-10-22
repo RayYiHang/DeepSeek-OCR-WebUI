@@ -41,6 +41,356 @@
             margin: 0 auto;
         }
 
+        /* Find Mode Container - 左右分栏布局 */
+        .find-mode-container {
+            display: none;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px var(--shadow);
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .find-mode-container.active {
+            display: block;
+        }
+
+        .find-split-layout {
+            display: grid;
+            grid-template-columns: 450px 1fr;
+            gap: 30px;
+            min-height: 600px;
+        }
+
+        /* 左侧面板 - 上传和控制 */
+        .find-left-panel {
+            border-right: 2px solid var(--border);
+            padding-right: 30px;
+        }
+
+        .find-panel-title {
+            font-size: 1.3em;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .find-upload-zone {
+            border: 3px dashed var(--border);
+            border-radius: var(--radius);
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: var(--light);
+            margin-bottom: 25px;
+        }
+
+        .find-upload-zone:hover {
+            border-color: var(--primary);
+            background: #f0f4ff;
+            transform: translateY(-2px);
+        }
+
+        .find-upload-zone.drag-over {
+            border-color: var(--primary);
+            background: #e0e7ff;
+            transform: scale(1.02);
+        }
+
+        .find-upload-icon {
+            font-size: 60px;
+            margin-bottom: 15px;
+            opacity: 0.6;
+        }
+
+        .find-upload-text {
+            font-size: 1.1em;
+            color: var(--text);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .find-upload-hint {
+            font-size: 0.9em;
+            color: var(--text-light);
+        }
+
+        .find-uploaded-preview {
+            display: none;
+            border-radius: var(--radius);
+            overflow: hidden;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .find-uploaded-preview.active {
+            display: block;
+        }
+
+        .find-uploaded-preview img {
+            width: 100%;
+            display: block;
+            max-height: 250px;
+            object-fit: contain;
+            background: #000;
+        }
+
+        .find-uploaded-info {
+            padding: 12px;
+            background: var(--light);
+            font-size: 0.9em;
+            color: var(--text-light);
+        }
+
+        .find-input-group {
+            margin-bottom: 25px;
+        }
+
+        .find-input-label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 0.95em;
+        }
+
+        .find-input-field {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 1em;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .find-input-field:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .find-input-hint {
+            margin-top: 8px;
+            font-size: 0.85em;
+            color: var(--text-light);
+            line-height: 1.4;
+        }
+
+        .find-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .find-btn {
+            width: 100%;
+            padding: 14px 24px;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .find-btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
+
+        .find-btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .find-btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .find-btn-secondary {
+            background: white;
+            color: var(--text);
+            border: 2px solid var(--border);
+        }
+
+        .find-btn-secondary:hover {
+            background: var(--light);
+            border-color: var(--primary);
+        }
+
+        /* 右侧面板 - 结果展示 */
+        .find-right-panel {
+            padding-left: 30px;
+        }
+        
+        .find-right-panel .find-result-image-wrapper {
+            text-align: center;
+        }
+
+        .find-result-container {
+            display: none;
+        }
+
+        .find-result-container.active {
+            display: block;
+        }
+
+        .find-result-empty {
+            text-align: center;
+            padding: 80px 40px;
+            color: var(--text-light);
+        }
+
+        .find-result-empty-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .find-result-empty-text {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+
+        .find-result-empty-hint {
+            font-size: 0.95em;
+        }
+
+        .find-result-image-wrapper {
+            position: relative;
+            border-radius: var(--radius);
+            overflow: hidden;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            background: #000;
+            display: inline-block;
+            max-width: 100%;
+        }
+
+        .find-result-image-wrapper img {
+            display: block;
+            width: auto;
+            height: auto;
+            max-width: 100%;
+            max-height: 600px;
+        }
+
+        .find-result-image-wrapper canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+
+        .find-result-stats {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .find-stat-badge {
+            padding: 8px 16px;
+            background: var(--light);
+            border-radius: 20px;
+            font-size: 0.9em;
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        .find-stat-badge.success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .find-result-text-area {
+            background: var(--light);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .find-result-text {
+            font-size: 1em;
+            line-height: 1.6;
+            color: var(--text);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .find-matches-list {
+            background: var(--light);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+        }
+
+        .find-matches-title {
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .find-match-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid;
+        }
+
+        .find-match-color {
+            width: 30px;
+            height: 30px;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .find-match-info {
+            flex: 1;
+        }
+
+        .find-match-label {
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 3px;
+        }
+
+        .find-match-coords {
+            font-size: 0.85em;
+            color: var(--text-light);
+            font-family: 'Courier New', monospace;
+        }
+
+        /* 批量处理主容器 - 默认显示 */
+        .batch-mode-container {
+            display: block;
+        }
+
+        .batch-mode-container.hidden {
+            display: none;
+        }
+
         /* Header */
         .header {
             text-align: center;
@@ -174,6 +524,93 @@
 
         .images-section.active {
             display: block;
+        }
+
+        /* Single Image Section (Find 模式) */
+        .single-image-section {
+            padding: 40px;
+            display: none;
+        }
+
+        .single-image-section.active {
+            display: block;
+        }
+
+        .single-image-preview {
+            background: var(--bg-light);
+            border: 3px dashed var(--border-color);
+            border-radius: 20px;
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-center;
+            position: relative;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .single-image-preview:hover {
+            border-color: var(--primary-color);
+            background: var(--bg-lighter);
+        }
+
+        .single-image-preview.drag-over {
+            border-color: var(--primary-color);
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(147, 51, 234, 0.1));
+            transform: scale(1.02);
+        }
+
+        .preview-placeholder {
+            text-align: center;
+            padding: 60px 40px;
+        }
+
+        .preview-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .preview-text {
+            font-size: 1.3em;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .preview-hint {
+            color: var(--text-light);
+            font-size: 0.95em;
+        }
+
+        .preview-container {
+            width: 100%;
+            padding: 20px;
+        }
+
+        .preview-image-wrapper {
+            position: relative;
+            display: inline-block;
+            max-width: 100%;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            border-radius: 12px;
+            overflow: hidden;
+            background: #000;
+        }
+
+        .preview-image-wrapper img {
+            display: block;
+            max-width: 100%;
+            height: auto;
+        }
+
+        .preview-image-wrapper canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
         }
 
         .section-header {
@@ -762,15 +1199,42 @@
     <div class="container">
         <!-- Header -->
         <div class="header">
-            <h1>🔍 DeepSeek OCR</h1>
-            <p>智能图像识别 · 批量处理 · 多模式支持</p>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <!-- GitHub Link -->
+                <div style="flex: 1;">
+                    <a href="https://github.com/neosun100/DeepSeek-OCR-WebUI" target="_blank" rel="noopener noreferrer" 
+                       style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.3); border-radius: 8px; color: white; text-decoration: none; font-size: 14px; font-weight: 500; transition: all 0.3s ease;"
+                       onmouseover="this.style.background='rgba(255,255,255,0.2)'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.2)';"
+                       onmouseout="this.style.background='rgba(255,255,255,0.1)'; this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+                        <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+                        </svg>
+                        <span data-i18n="github.starButton">⭐ Star on GitHub</span>
+                    </a>
+                </div>
+                
+                <!-- Title -->
+                <div style="flex: 1; text-align: center;">
+                    <h1>🔍 DeepSeek OCR</h1>
+                </div>
+                
+                <!-- Language Switcher -->
+                <div style="flex: 1; text-align: right;">
+                    <select id="languageSwitcher" style="padding: 8px 12px; border-radius: 8px; border: 2px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: white; font-size: 14px; cursor: pointer;">
+                        <option value="zh-CN">🇨🇳 简体中文</option>
+                        <option value="zh-TW">🇹🇼 繁體中文</option>
+                        <option value="en-US">🇺🇸 English</option>
+                        <option value="ja-JP">🇯🇵 日本語</option>
+                    </select>
+                </div>
+            </div>
+            <p id="headerSubtitle">智能图像识别 · 批量处理 · 多模式支持</p>
         </div>
 
-        <!-- Main Card -->
-        <div class="main-card">
-            <!-- Mode Selection -->
+        <!-- Mode Selection (始终可见) -->
+        <div class="main-card" style="margin-bottom: 20px;">
             <div class="mode-section">
-                <div class="mode-title">选择识别模式</div>
+                <div class="mode-title">选择识别模式（增强版：新增 Find 和 Freeform）</div>
                 <div class="mode-grid">
                     <div class="mode-option active" data-mode="document">
                         <span class="mode-icon">📄</span>
@@ -792,6 +1256,128 @@
                         <span class="mode-icon">🖼️</span>
                         <div class="mode-name">图像描述</div>
                     </div>
+                    <div class="mode-option" data-mode="find">
+                        <span class="mode-icon">🔍</span>
+                        <div class="mode-name">查找定位</div>
+                    </div>
+                    <div class="mode-option" data-mode="freeform">
+                        <span class="mode-icon">✨</span>
+                        <div class="mode-name">自定义提示</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Find Mode Container (左右分栏布局) -->
+        <div class="find-mode-container" id="findModeContainer">
+            <div class="find-split-layout">
+                <!-- 左侧面板 -->
+                <div class="find-left-panel">
+                    <div class="find-panel-title">
+                        <span>🔍</span>
+                        <span>查找定位</span>
+                    </div>
+                    
+                    <!-- 上传区域 -->
+                    <div class="find-upload-zone" id="findUploadZone">
+                        <div class="find-upload-icon">📤</div>
+                        <div class="find-upload-text">点击或拖拽上传图片</div>
+                        <div class="find-upload-hint">支持 JPG, PNG, JPEG, BMP, GIF</div>
+                    </div>
+                    
+                    <!-- 已上传图片预览 -->
+                    <div class="find-uploaded-preview" id="findUploadedPreview">
+                        <img id="findUploadedImage" alt="Uploaded" />
+                        <div class="find-uploaded-info" id="findUploadedInfo"></div>
+                    </div>
+                    
+                    <!-- 查找词输入 -->
+                    <div class="find-input-group">
+                        <label class="find-input-label">
+                            <span>🎯 输入查找内容</span>
+                        </label>
+                        <input 
+                            type="text" 
+                            class="find-input-field" 
+                            id="findTermInput"
+                            placeholder="例如：Total, Invoice #, 金额, 姓名"
+                        />
+                        <div class="find-input-hint">
+                            💡 输入图片中需要查找的文字，系统会自动定位并标注
+                        </div>
+                    </div>
+                    
+                    <!-- 操作按钮 -->
+                    <div class="find-actions">
+                        <button class="find-btn find-btn-primary" id="findProcessBtn" disabled>
+                            <span>🚀</span>
+                            <span>开始查找</span>
+                        </button>
+                        <button class="find-btn find-btn-secondary" id="findChangeBtn" disabled>
+                            <span>🔄</span>
+                            <span>更换图片</span>
+                        </button>
+                        <button class="find-btn find-btn-secondary" id="findClearBtn" disabled>
+                            <span>🗑️</span>
+                            <span>清空重置</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 右侧面板 -->
+                <div class="find-right-panel">
+                    <div class="find-panel-title">
+                        <span>✨</span>
+                        <span>识别结果</span>
+                    </div>
+                    
+                    <!-- 空状态 -->
+                    <div class="find-result-empty" id="findResultEmpty">
+                        <div class="find-result-empty-icon">🎯</div>
+                        <div class="find-result-empty-text">等待识别</div>
+                        <div class="find-result-empty-hint">上传图片并输入查找词，点击"开始查找"即可</div>
+                    </div>
+                    
+                    <!-- 结果容器 -->
+                    <div class="find-result-container" id="findResultContainer">
+                        <!-- 结果图片（带边界框） -->
+                        <div class="find-result-image-wrapper" id="findResultImageWrapper">
+                            <img id="findResultImage" alt="Result" />
+                            <canvas id="findResultCanvas"></canvas>
+                        </div>
+                        
+                        <!-- 统计信息 -->
+                        <div class="find-result-stats" id="findResultStats"></div>
+                        
+                        <!-- 识别文本 -->
+                        <div class="find-result-text-area">
+                            <div class="find-result-text" id="findResultText">等待识别...</div>
+                        </div>
+                        
+                        <!-- 匹配项列表 -->
+                        <div class="find-matches-list" id="findMatchesList" style="display: none;">
+                            <div class="find-matches-title">
+                                <span>📦</span>
+                                <span>找到的匹配项</span>
+                            </div>
+                            <div id="findMatchesContent"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Batch Mode Container (批量处理模式) -->
+        <div class="batch-mode-container" id="batchModeContainer">
+        <!-- Main Card -->
+        <div class="main-card">
+            <!-- Freeform Prompt Input (批量模式专用) -->
+            <div id="freeformInputBatch" style="display: none; margin-bottom: 20px; padding: 20px; background: rgba(255,255,255,0.1); border-radius: 12px;">
+                <label style="display: block; margin-bottom: 10px; color: white; font-weight: 600;">✨ 自定义提示词</label>
+                <textarea id="customPromptBatch" placeholder="输入自定义提示词（如：提取所有日期和金额）" 
+                          style="width: 100%; padding: 12px; border-radius: 8px; border: 2px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: white; font-size: 14px; min-height: 80px; resize: vertical;"></textarea>
+                <div style="margin-top: 8px; color: rgba(255,255,255,0.8); font-size: 12px;">
+                    ✨ 提示：描述你想要的识别效果，AI 会按照你的要求处理每张图片
                 </div>
             </div>
 
@@ -805,7 +1391,39 @@
                 </div>
             </div>
 
-            <!-- Images Grid Section -->
+            <!-- Single Image Mode (Find 模式专用) -->
+            <div class="single-image-section" id="singleImageSection" style="display: none;">
+                <div class="section-header">
+                    <div class="section-title">🔍 查找定位模式 - 单图处理</div>
+                    <div style="color: var(--text-light); font-size: 0.9em;">💡 上传图片后将自动标注找到的位置</div>
+                </div>
+                <div class="single-image-preview" id="singleImagePreview">
+                    <div class="preview-placeholder">
+                        <div class="preview-icon">🖼️</div>
+                        <div class="preview-text">点击或拖拽上传单张图片</div>
+                        <div class="preview-hint">支持 JPG, PNG, JPEG, BMP, GIF</div>
+                    </div>
+                    <div class="preview-container" id="previewContainer" style="display: none;">
+                        <div class="preview-image-wrapper">
+                            <img id="previewImage" alt="Preview" style="display: block; max-width: 100%; height: auto;">
+                            <canvas id="boundingBoxCanvas" style="position: absolute; top: 0; left: 0; pointer-events: none;"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn btn-primary" id="processSingleBtn">
+                        <span>🚀</span> 开始查找
+                    </button>
+                    <button class="btn btn-secondary" id="changeSingleBtn">
+                        <span>🔄</span> 更换图片
+                    </button>
+                    <button class="btn btn-danger" id="clearSingleBtn">
+                        <span>🗑️</span> 清空
+                    </button>
+                </div>
+            </div>
+
+            <!-- Images Grid Section (批量模式) -->
             <div class="images-section" id="imagesSection">
                 <div class="section-header">
                     <div class="section-title">已上传图片 (<span id="imageCount">0</span>)</div>
@@ -869,6 +1487,65 @@
                 <div class="log-container" id="logContent"></div>
             </div>
         </div>
+        </div> <!-- End of batch-mode-container -->
+        
+        <!-- Footer -->
+        <div style="margin-top: 60px; padding: 40px 20px; background: rgba(255,255,255,0.05); border-top: 1px solid rgba(255,255,255,0.1); border-radius: 20px;">
+            <div style="max-width: 1200px; margin: 0 auto;">
+                <!-- GitHub Star Banner -->
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <div style="display: inline-block; padding: 30px 50px; background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.2)); border: 2px solid rgba(255,255,255,0.2); border-radius: 16px; backdrop-filter: blur(10px);">
+                        <div style="font-size: 1.5em; font-weight: 700; color: white; margin-bottom: 15px;" data-i18n="github.bannerTitle">
+                            ⭐ 喜欢这个项目？给我们一个 Star！⭐
+                        </div>
+                        <div style="font-size: 1em; color: rgba(255,255,255,0.8); margin-bottom: 20px;" data-i18n="github.bannerDesc">
+                            如果这个项目对你有帮助，请在 GitHub 上给我们一个 Star 支持一下！
+                        </div>
+                        <a href="https://github.com/neosun100/DeepSeek-OCR-WebUI" target="_blank" rel="noopener noreferrer"
+                           style="display: inline-flex; align-items: center; gap: 12px; padding: 14px 32px; background: linear-gradient(135deg, #6366f1, #8b5cf6); border: none; border-radius: 12px; color: white; text-decoration: none; font-size: 1.1em; font-weight: 600; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4); transition: all 0.3s ease;"
+                           onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 6px 20px rgba(99, 102, 241, 0.6)';"
+                           onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(99, 102, 241, 0.4)';">
+                            <svg width="24" height="24" viewBox="0 0 16 16" fill="currentColor">
+                                <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+                            </svg>
+                            <span data-i18n="github.bannerButton">⭐ 在 GitHub 上给我们 Star</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Footer Links -->
+                <div style="display: flex; justify-content: center; gap: 40px; flex-wrap: wrap; margin-bottom: 25px;">
+                    <a href="https://github.com/neosun100/DeepSeek-OCR-WebUI" target="_blank" style="color: rgba(255,255,255,0.8); text-decoration: none; font-size: 0.95em; transition: color 0.3s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.8)'" data-i18n="github.linkHome">
+                        🏠 项目主页
+                    </a>
+                    <a href="https://github.com/neosun100/DeepSeek-OCR-WebUI/issues" target="_blank" style="color: rgba(255,255,255,0.8); text-decoration: none; font-size: 0.95em; transition: color 0.3s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.8)'" data-i18n="github.linkIssues">
+                        🐛 问题反馈
+                    </a>
+                    <a href="https://github.com/neosun100/DeepSeek-OCR-WebUI/blob/main/README.md" target="_blank" style="color: rgba(255,255,255,0.8); text-decoration: none; font-size: 0.95em; transition: color 0.3s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.8)'" data-i18n="github.linkDocs">
+                        📖 使用文档
+                    </a>
+                    <a href="https://github.com/neosun100/DeepSeek-OCR-WebUI/blob/main/CHANGELOG.md" target="_blank" style="color: rgba(255,255,255,0.8); text-decoration: none; font-size: 0.95em; transition: color 0.3s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.8)'" data-i18n="github.linkChangelog">
+                        📝 更新日志
+                    </a>
+                </div>
+                
+                <!-- Copyright -->
+                <div style="text-align: center; color: rgba(255,255,255,0.6); font-size: 0.9em; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+                    <p style="margin: 5px 0;">
+                        <span data-i18n="github.madeWith">Made with ❤️ by</span> <a href="https://github.com/neosun100" target="_blank" style="color: rgba(255,255,255,0.8); text-decoration: none;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.8)'">@neosun100</a>
+                    </p>
+                    <p style="margin: 5px 0;">
+                        DeepSeek-OCR-WebUI v3.1 | © 2025 | MIT License
+                    </p>
+                    <p style="margin: 10px 0 0 0;">
+                        <a href="https://github.com/deepseek-ai" target="_blank" style="color: rgba(255,255,255,0.6); text-decoration: none; font-size: 0.85em;" onmouseover="this.style.color='rgba(255,255,255,0.8)'" onmouseout="this.style.color='rgba(255,255,255,0.6)'" data-i18n="github.poweredBy">
+                            Powered by DeepSeek-OCR
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+        
     </div>
 
     <!-- Toast Notification -->
@@ -878,6 +1555,364 @@
     </div>
 
     <script>
+        // ====================================
+        // Internationalization (i18n)
+        // ====================================
+        const translations = {
+            'zh-CN': {
+                headerSubtitle: '智能图像识别 · 批量处理 · 多模式支持',
+                modeTitle: '选择识别模式（增强版：新增 Find 和 Freeform）',
+                modes: {
+                    document: '文档转Markdown',
+                    ocr: '通用OCR',
+                    free: '纯文本提取',
+                    figure: '图表解析',
+                    describe: '图像描述',
+                    find: '查找定位',
+                    freeform: '自定义提示'
+                },
+                findMode: {
+                    title: '查找定位',
+                    uploadText: '点击或拖拽上传图片',
+                    uploadHint: '支持 JPG, PNG, JPEG, BMP, GIF',
+                    inputLabel: '输入查找内容',
+                    inputPlaceholder: '例如：Total, Invoice #, 金额, 姓名',
+                    inputHint: '输入图片中需要查找的文字，系统会自动定位并标注',
+                    btnProcess: '开始查找',
+                    btnChange: '更换图片',
+                    btnClear: '清空重置',
+                    resultTitle: '识别结果',
+                    emptyText: '等待识别',
+                    emptyHint: '上传图片并输入查找词，点击"开始查找"即可',
+                    matchesTitle: '找到的匹配项'
+                },
+                batchMode: {
+                    freeformLabel: '自定义提示词',
+                    freeformPlaceholder: '输入自定义提示词（如：提取所有日期和金额）',
+                    freeformHint: '描述你想要的识别效果，AI 会按照你的要求处理每张图片',
+                    imagesTitle: '已上传图片',
+                    imagesDragHint: '拖动图片可调整顺序',
+                    btnProcess: '开始识别',
+                    btnAddMore: '继续添加',
+                    btnClear: '清空全部',
+                    progressTitle: '识别进度',
+                    processed: '已处理:',
+                    total: '总计:',
+                    resultTitle: '识别结果',
+                    btnCopy: '复制文本',
+                    btnDownload: '下载文本',
+                    logTitle: '操作日志',
+                    logCount: '共',
+                    logRecords: '条记录'
+                },
+                github: {
+                    starButton: '⭐ Star on GitHub',
+                    bannerTitle: '⭐ 喜欢这个项目？给我们一个 Star！⭐',
+                    bannerDesc: '如果这个项目对你有帮助，请在 GitHub 上给我们一个 Star 支持一下！',
+                    bannerButton: '⭐ 在 GitHub 上给我们 Star',
+                    linkHome: '🏠 项目主页',
+                    linkIssues: '🐛 问题反馈',
+                    linkDocs: '📖 使用文档',
+                    linkChangelog: '📝 更新日志',
+                    madeWith: 'Made with ❤️ by',
+                    poweredBy: 'Powered by DeepSeek-OCR'
+                }
+            },
+            'zh-TW': {
+                headerSubtitle: '智能圖像識別 · 批量處理 · 多模式支援',
+                modeTitle: '選擇識別模式（增強版：新增 Find 和 Freeform）',
+                modes: {
+                    document: '文檔轉Markdown',
+                    ocr: '通用OCR',
+                    free: '純文本提取',
+                    figure: '圖表解析',
+                    describe: '圖像描述',
+                    find: '查找定位',
+                    freeform: '自定義提示'
+                },
+                findMode: {
+                    title: '查找定位',
+                    uploadText: '點擊或拖拽上傳圖片',
+                    uploadHint: '支援 JPG, PNG, JPEG, BMP, GIF',
+                    inputLabel: '輸入查找內容',
+                    inputPlaceholder: '例如：Total, Invoice #, 金額, 姓名',
+                    inputHint: '輸入圖片中需要查找的文字，系統會自動定位並標註',
+                    btnProcess: '開始查找',
+                    btnChange: '更換圖片',
+                    btnClear: '清空重置',
+                    resultTitle: '識別結果',
+                    emptyText: '等待識別',
+                    emptyHint: '上傳圖片並輸入查找詞，點擊"開始查找"即可',
+                    matchesTitle: '找到的匹配項'
+                },
+                batchMode: {
+                    freeformLabel: '自定義提示詞',
+                    freeformPlaceholder: '輸入自定義提示詞（如：提取所有日期和金額）',
+                    freeformHint: '描述你想要的識別效果，AI 會按照你的要求處理每張圖片',
+                    imagesTitle: '已上傳圖片',
+                    imagesDragHint: '拖動圖片可調整順序',
+                    btnProcess: '開始識別',
+                    btnAddMore: '繼續添加',
+                    btnClear: '清空全部',
+                    progressTitle: '識別進度',
+                    processed: '已處理:',
+                    total: '總計:',
+                    resultTitle: '識別結果',
+                    btnCopy: '複製文本',
+                    btnDownload: '下載文本',
+                    logTitle: '操作日誌',
+                    logCount: '共',
+                    logRecords: '條記錄'
+                },
+                github: {
+                    starButton: '⭐ Star on GitHub',
+                    bannerTitle: '⭐ 喜歡這個項目？給我們一個 Star！⭐',
+                    bannerDesc: '如果這個項目對你有幫助，請在 GitHub 上給我們一個 Star 支持一下！',
+                    bannerButton: '⭐ 在 GitHub 上給我們 Star',
+                    linkHome: '🏠 項目主頁',
+                    linkIssues: '🐛 問題反饋',
+                    linkDocs: '📖 使用文檔',
+                    linkChangelog: '📝 更新日誌',
+                    madeWith: 'Made with ❤️ by',
+                    poweredBy: 'Powered by DeepSeek-OCR'
+                }
+            },
+            'en-US': {
+                headerSubtitle: 'Intelligent Image Recognition · Batch Processing · Multi-Mode Support',
+                modeTitle: 'Select Recognition Mode (Enhanced: New Find & Freeform)',
+                modes: {
+                    document: 'Doc to Markdown',
+                    ocr: 'General OCR',
+                    free: 'Plain Text',
+                    figure: 'Chart Parser',
+                    describe: 'Image Description',
+                    find: 'Find & Locate',
+                    freeform: 'Custom Prompt'
+                },
+                findMode: {
+                    title: 'Find & Locate',
+                    uploadText: 'Click or drag to upload image',
+                    uploadHint: 'Support JPG, PNG, JPEG, BMP, GIF',
+                    inputLabel: 'Enter search term',
+                    inputPlaceholder: 'e.g.: Total, Invoice #, Amount, Name',
+                    inputHint: 'Enter text to find in image, system will locate automatically',
+                    btnProcess: 'Start Search',
+                    btnChange: 'Change Image',
+                    btnClear: 'Clear & Reset',
+                    resultTitle: 'Recognition Result',
+                    emptyText: 'Waiting',
+                    emptyHint: 'Upload image and enter search term, then click "Start Search"',
+                    matchesTitle: 'Found Matches'
+                },
+                batchMode: {
+                    freeformLabel: 'Custom Prompt',
+                    freeformPlaceholder: 'Enter custom prompt (e.g.: Extract all dates and amounts)',
+                    freeformHint: 'Describe what you want, AI will process each image accordingly',
+                    imagesTitle: 'Uploaded Images',
+                    imagesDragHint: 'Drag to reorder',
+                    btnProcess: 'Start Recognition',
+                    btnAddMore: 'Add More',
+                    btnClear: 'Clear All',
+                    progressTitle: 'Progress',
+                    processed: 'Processed:',
+                    total: 'Total:',
+                    resultTitle: 'Result',
+                    btnCopy: 'Copy Text',
+                    btnDownload: 'Download',
+                    logTitle: 'Operation Log',
+                    logCount: 'Total',
+                    logRecords: 'records'
+                },
+                github: {
+                    starButton: '⭐ Star on GitHub',
+                    bannerTitle: '⭐ Like this project? Give us a Star! ⭐',
+                    bannerDesc: 'If this project helps you, please give us a Star on GitHub!',
+                    bannerButton: '⭐ Star us on GitHub',
+                    linkHome: '🏠 Home',
+                    linkIssues: '🐛 Issues',
+                    linkDocs: '📖 Documentation',
+                    linkChangelog: '📝 Changelog',
+                    madeWith: 'Made with ❤️ by',
+                    poweredBy: 'Powered by DeepSeek-OCR'
+                }
+            },
+            'ja-JP': {
+                headerSubtitle: 'インテリジェント画像認識 · バッチ処理 · マルチモードサポート',
+                modeTitle: '認識モードを選択（拡張版：Find と Freeform を追加）',
+                modes: {
+                    document: 'ドキュメントをMarkdownへ',
+                    ocr: '汎用OCR',
+                    free: 'プレーンテキスト抽出',
+                    figure: 'チャート解析',
+                    describe: '画像説明',
+                    find: '検索と位置特定',
+                    freeform: 'カスタムプロンプト'
+                },
+                findMode: {
+                    title: '検索と位置特定',
+                    uploadText: 'クリックまたはドラッグして画像をアップロード',
+                    uploadHint: 'JPG, PNG, JPEG, BMP, GIF をサポート',
+                    inputLabel: '検索内容を入力',
+                    inputPlaceholder: '例：Total, Invoice #, 金額, 名前',
+                    inputHint: '画像内で検索したいテキストを入力すると、システムが自動的に位置を特定します',
+                    btnProcess: '検索開始',
+                    btnChange: '画像を変更',
+                    btnClear: 'クリアしてリセット',
+                    resultTitle: '認識結果',
+                    emptyText: '認識待ち',
+                    emptyHint: '画像をアップロードして検索語を入力し、「検索開始」をクリックしてください',
+                    matchesTitle: '見つかった一致項目'
+                },
+                batchMode: {
+                    freeformLabel: 'カスタムプロンプト',
+                    freeformPlaceholder: 'カスタムプロンプトを入力（例：すべての日付と金額を抽出）',
+                    freeformHint: '希望する認識効果を説明すると、AIが要求に応じて各画像を処理します',
+                    imagesTitle: 'アップロード済み画像',
+                    imagesDragHint: 'ドラッグして順序を調整',
+                    btnProcess: '認識開始',
+                    btnAddMore: 'さらに追加',
+                    btnClear: 'すべてクリア',
+                    progressTitle: '認識進捗',
+                    processed: '処理済み:',
+                    total: '合計:',
+                    resultTitle: '認識結果',
+                    btnCopy: 'テキストをコピー',
+                    btnDownload: 'ダウンロード',
+                    logTitle: '操作ログ',
+                    logCount: '合計',
+                    logRecords: '件の記録'
+                },
+                github: {
+                    starButton: '⭐ Star on GitHub',
+                    bannerTitle: '⭐ このプロジェクトが気に入りましたか？Starをください！⭐',
+                    bannerDesc: 'このプロジェクトがお役に立ちましたら、GitHubでStarをつけてサポートしてください！',
+                    bannerButton: '⭐ GitHubでStarをつける',
+                    linkHome: '🏠 ホーム',
+                    linkIssues: '🐛 問題報告',
+                    linkDocs: '📖 ドキュメント',
+                    linkChangelog: '📝 更新履歴',
+                    madeWith: 'Made with ❤️ by',
+                    poweredBy: 'Powered by DeepSeek-OCR'
+                }
+            }
+        };
+        
+        // Current language
+        let currentLang = localStorage.getItem('ocr_language') || 'zh-CN';
+        
+        // Get translation
+        function t(path) {
+            const keys = path.split('.');
+            let value = translations[currentLang];
+            for (const key of keys) {
+                value = value?.[key];
+                if (value === undefined) return path;
+            }
+            return value;
+        }
+        
+        // Update all UI text
+        function updateUILanguage() {
+            console.log('🌐 切换语言到:', currentLang);
+            
+            // Update header subtitle
+            const subtitle = document.getElementById('headerSubtitle');
+            if (subtitle) subtitle.textContent = t('headerSubtitle');
+            
+            // Update mode title
+            const modeTitle = document.querySelector('.mode-title');
+            if (modeTitle) modeTitle.textContent = t('modeTitle');
+            
+            // Update mode names
+            document.querySelectorAll('.mode-option').forEach(option => {
+                const mode = option.dataset.mode;
+                const nameEl = option.querySelector('.mode-name');
+                if (nameEl && t(`modes.${mode}`)) {
+                    nameEl.textContent = t(`modes.${mode}`);
+                }
+            });
+            
+            // Update Find mode texts
+            const findTexts = {
+                '.find-panel-title span:last-child': 'findMode.title',
+                '.find-upload-text': 'findMode.uploadText',
+                '.find-upload-hint': 'findMode.uploadHint',
+                '.find-input-label': 'findMode.inputLabel',
+                '.find-result-empty-text': 'findMode.emptyText',
+                '.find-result-empty-hint': 'findMode.emptyHint',
+                '.find-matches-title span:last-child': 'findMode.matchesTitle'
+            };
+            
+            for (const [selector, key] of Object.entries(findTexts)) {
+                const el = document.querySelector(selector);
+                if (el) el.textContent = t(key);
+            }
+            
+            // Update Find mode placeholders and hints
+            const findInput = document.getElementById('findTermInput');
+            if (findInput) findInput.placeholder = t('findMode.inputPlaceholder');
+            
+            const findHint = document.querySelector('.find-input-hint');
+            if (findHint) findHint.textContent = t('findMode.inputHint');
+            
+            // Update Find mode buttons
+            const findBtns = {
+                'findProcessBtn': 'findMode.btnProcess',
+                'findChangeBtn': 'findMode.btnChange',
+                'findClearBtn': 'findMode.btnClear'
+            };
+            
+            for (const [id, key] of Object.entries(findBtns)) {
+                const btn = document.getElementById(id);
+                if (btn) {
+                    const span = btn.querySelector('span:last-child');
+                    if (span) span.textContent = t(key).replace(/^[🚀🔄🗑️]\s*/, '');
+                }
+            }
+            
+            // Update batch mode
+            const batchBtns = {
+                'processBtn': 'batchMode.btnProcess',
+                'addMoreBtn': 'batchMode.btnAddMore',
+                'clearBtn': 'batchMode.btnClear',
+                'copyBtn': 'batchMode.btnCopy',
+                'downloadBtn': 'batchMode.btnDownload'
+            };
+            
+            for (const [id, key] of Object.entries(batchBtns)) {
+                const btn = document.getElementById(id);
+                if (btn) {
+                    const span = btn.querySelector('span:last-child');
+                    if (span) span.textContent = t(key).replace(/^[🚀➕🗑️📋⬇️]\s*/, '');
+                }
+            }
+            
+            // Update data-i18n elements
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                el.textContent = t(key);
+            });
+            
+            console.log('✅ 语言切换完成');
+        }
+        
+        // Initialize language switcher
+        function initLanguageSwitcher() {
+            const switcher = document.getElementById('languageSwitcher');
+            if (switcher) {
+                switcher.value = currentLang;
+                switcher.addEventListener('change', (e) => {
+                    currentLang = e.target.value;
+                    localStorage.setItem('ocr_language', currentLang);
+                    updateUILanguage();
+                });
+            }
+        }
+        
+        // ====================================
+        // End of i18n
+        // ====================================
+
         // Configuration
         const CONFIG = {
             apiUrl: 'https://deepseek-ocr.aws.xin',
@@ -889,7 +1924,8 @@
             mode: 'document',
             images: [],
             results: [],
-            isProcessing: false
+            isProcessing: false,
+            singleImage: null  // 用于 Find 模式的单图
         };
 
         // DOM Elements
@@ -1000,6 +2036,37 @@
                     state.mode = newMode;
                     const modeName = option.querySelector('.mode-name').textContent;
                     
+                    // Find 模式切换到专用界面
+                    const isFindMode = (newMode === 'find');
+                    const findContainer = document.getElementById('findModeContainer');
+                    const batchContainer = document.getElementById('batchModeContainer');
+                    
+                    if (isFindMode) {
+                        // 切换到 Find 专用界面
+                        findContainer.classList.add('active');
+                        batchContainer.classList.add('hidden');
+                        addLog('切换模式', 'info', '已切换到查找定位模式（单图处理）', {
+                            '模式': '🔍 Find Mode',
+                            '布局': '左右分栏',
+                            '特性': '边界框可视化'
+                        });
+                    } else {
+                        // 切换回批量处理界面
+                        findContainer.classList.remove('active');
+                        batchContainer.classList.remove('hidden');
+                        
+                        // 显示/隐藏 Freeform 批量模式的输入框
+                        const freeformInputBatch = document.getElementById('freeformInputBatch');
+                        if (freeformInputBatch) {
+                            freeformInputBatch.style.display = (newMode === 'freeform') ? 'block' : 'none';
+                        }
+                        
+                        addLog('切换模式', 'info', `已切换到${modeName}模式（批量处理）`, {
+                            '模式': modeName,
+                            '类型': '批量处理'
+                        });
+                    }
+                    
                     // 检查是否已经完成识别
                     const hasCompletedImages = state.images.some(img => img.status === 'completed' || img.status === 'error');
                     
@@ -1051,7 +2118,9 @@
                 'ocr': '通用OCR',
                 'free': '纯文本提取',
                 'figure': '图表解析',
-                'describe': '图像描述'
+                'describe': '图像描述',
+                'find': '查找定位 (Find)',
+                'freeform': '自定义 (Freeform)'
             };
             return names[mode] || mode;
         }
@@ -1062,7 +2131,9 @@
                 'ocr': '提取所有可见文字',
                 'free': '纯文本不保留格式',
                 'figure': '识别图表公式等',
-                'describe': '生成详细图像描述'
+                'describe': '生成详细图像描述',
+                'find': '查找并定位特定内容',
+                'freeform': '使用自定义提示词'
             };
             return descriptions[mode] || '未知';
         }
@@ -1274,6 +2345,112 @@
             elements.clearBtn.addEventListener('click', clearAll);
             elements.copyBtn.addEventListener('click', copyResult);
             elements.downloadBtn.addEventListener('click', downloadResult);
+            
+            // 单图模式按钮
+            document.getElementById('processSingleBtn').addEventListener('click', processSingleImage);
+            document.getElementById('changeSingleBtn').addEventListener('click', () => {
+                document.getElementById('singleImagePreview').click();
+            });
+            document.getElementById('clearSingleBtn').addEventListener('click', clearSingleImage);
+            
+            // 单图上传区域点击事件
+            const singlePreview = document.getElementById('singleImagePreview');
+            singlePreview.addEventListener('click', (e) => {
+                if (e.target.closest('.preview-placeholder') || e.target === singlePreview) {
+                    const input = document.createElement('input');
+                    input.type = 'file';
+                    input.accept = 'image/*';
+                    input.onchange = (e) => {
+                        if (e.target.files && e.target.files[0]) {
+                            handleSingleImageUpload(e.target.files[0]);
+                        }
+                    };
+                    input.click();
+                }
+            });
+            
+            // 单图拖拽上传
+            singlePreview.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                singlePreview.classList.add('drag-over');
+            });
+            
+            singlePreview.addEventListener('dragleave', () => {
+                singlePreview.classList.remove('drag-over');
+            });
+            
+            singlePreview.addEventListener('drop', (e) => {
+                e.preventDefault();
+                singlePreview.classList.remove('drag-over');
+                if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                    handleSingleImageUpload(e.dataTransfer.files[0]);
+                }
+            });
+        }
+
+        // Handle Single Image Upload（单图上传处理）
+        function handleSingleImageUpload(file) {
+            if (!file.type.startsWith('image/')) {
+                showToast('请选择图片文件', 'error');
+                return;
+            }
+
+            // 保存到 state
+            state.singleImage = {
+                file: file,
+                name: file.name,
+                size: formatFileSize(file.size)
+            };
+
+            // 显示预览
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const imgElement = document.getElementById('previewImage');
+                const canvas = document.getElementById('boundingBoxCanvas');
+                const placeholder = document.querySelector('.preview-placeholder');
+                const container = document.getElementById('previewContainer');
+
+                placeholder.style.display = 'none';
+                container.style.display = 'block';
+                
+                imgElement.src = e.target.result;
+                imgElement.onload = () => {
+                    // 清除旧的边界框
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = imgElement.offsetWidth;
+                    canvas.height = imgElement.offsetHeight;
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                };
+
+                addLog('图片上传成功', 'success', `已加载: ${file.name}`, {
+                    '文件名': file.name,
+                    '文件大小': formatFileSize(file.size),
+                    '模式': '单图查找定位'
+                });
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Clear Single Image（清空单图）
+        function clearSingleImage() {
+            state.singleImage = null;
+            
+            const placeholder = document.querySelector('.preview-placeholder');
+            const container = document.getElementById('previewContainer');
+            const canvas = document.getElementById('boundingBoxCanvas');
+            
+            placeholder.style.display = 'block';
+            container.style.display = 'none';
+            
+            // 清除 canvas
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // 清除结果
+            elements.resultSection.classList.remove('active');
+            
+            showToast('已清空图片', 'info');
+            addLog('清空图片', 'info', '已清除当前图片和识别结果');
         }
 
         // Start Processing
@@ -1388,6 +2565,22 @@
             const formData = new FormData();
             formData.append('file', image.file);
             formData.append('prompt_type', state.mode);
+            
+            // 添加 Find 模式的查找词
+            if (state.mode === 'find') {
+                const findTerm = document.getElementById('findTerm').value.trim();
+                formData.append('find_term', findTerm || 'Total');
+            }
+            
+            // 添加 Freeform 模式的自定义提示
+            if (state.mode === 'freeform') {
+                const customPromptInput = document.getElementById('customPromptBatch');
+                const customPrompt = customPromptInput ? customPromptInput.value.trim() : '';
+                formData.append('custom_prompt', customPrompt || 'OCR this image.');
+            }
+            
+            // 可选：添加 grounding 参数
+            formData.append('grounding', state.mode === 'find' || state.mode === 'document' || state.mode === 'ocr');
 
             const response = await fetch(`${CONFIG.apiUrl}/ocr`, {
                 method: 'POST',
@@ -1399,8 +2592,169 @@
             if (!data.success) {
                 throw new Error(data.error || '识别失败');
             }
+            
+            // 如果有 boxes 信息，保存到 image 对象中
+            if (data.boxes && data.boxes.length > 0) {
+                image.boxes = data.boxes;
+                image.imageDims = data.image_dims;
+            }
 
             return data.text;
+        }
+
+        // Draw Bounding Boxes on Canvas（边界框绘制函数）
+        function drawBoundingBoxes(imgElement, canvas, boxes, imageDims) {
+            if (!boxes || boxes.length === 0) {
+                console.log('❌ 没有边界框需要绘制');
+                return;
+            }
+
+            console.log('🎨 开始绘制边界框:', boxes);
+
+            const ctx = canvas.getContext('2d');
+            
+            // 设置 canvas 尺寸匹配图片显示尺寸
+            canvas.width = imgElement.offsetWidth;
+            canvas.height = imgElement.offsetHeight;
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // 计算缩放比例
+            const scaleX = imgElement.offsetWidth / (imageDims?.w || imgElement.naturalWidth);
+            const scaleY = imgElement.offsetHeight / (imageDims?.h || imgElement.naturalHeight);
+            
+            console.log('📏 缩放比例:', { scaleX, scaleY, canvasSize: { w: canvas.width, h: canvas.height } });
+            
+            // 颜色数组
+            const colors = ['#00ff00', '#00ffff', '#ff00ff', '#ffff00', '#ff0066', '#00ff99'];
+            
+            // 绘制每个边界框
+            boxes.forEach((box, idx) => {
+                const [x1, y1, x2, y2] = box.box;
+                const color = colors[idx % colors.length];
+                
+                // 缩放坐标
+                const sx = x1 * scaleX;
+                const sy = y1 * scaleY;
+                const sw = (x2 - x1) * scaleX;
+                const sh = (y2 - y1) * scaleY;
+                
+                console.log(`📦 Box ${idx} (${box.label}):`, {
+                    original: [x1, y1, x2, y2],
+                    scaled: [sx, sy, sw, sh]
+                });
+                
+                // 半透明填充
+                ctx.fillStyle = color + '33';
+                ctx.fillRect(sx, sy, sw, sh);
+                
+                // 霓虹边框
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 3;
+                ctx.shadowColor = color;
+                ctx.shadowBlur = 10;
+                ctx.strokeRect(sx, sy, sw, sh);
+                ctx.shadowBlur = 0;
+                
+                // 标签背景和文字
+                if (box.label) {
+                    ctx.font = 'bold 14px Arial';
+                    const metrics = ctx.measureText(box.label);
+                    const padding = 8;
+                    const labelHeight = 24;
+                    
+                    // 标签背景
+                    ctx.fillStyle = color;
+                    ctx.fillRect(sx, sy - labelHeight, metrics.width + padding * 2, labelHeight);
+                    
+                    // 标签文字
+                    ctx.fillStyle = '#000';
+                    ctx.fillText(box.label, sx + padding, sy - 7);
+                }
+            });
+            
+            console.log('✅ 完成绘制', boxes.length, '个边界框');
+        }
+
+        // Process Single Image for Find Mode（单图处理函数）
+        async function processSingleImage() {
+            const findTerm = document.getElementById('findTerm').value.trim();
+            if (!findTerm) {
+                showToast('请输入要查找的内容', 'error');
+                return;
+            }
+
+            const singleImageData = state.singleImage;
+            if (!singleImageData) {
+                showToast('请先上传图片', 'error');
+                return;
+            }
+
+            addLog('开始查找定位', 'info', `正在图片中查找: ${findTerm}`, {
+                '查找词': findTerm,
+                '图片名': singleImageData.name,
+                '文件大小': singleImageData.size
+            });
+
+            try {
+                const formData = new FormData();
+                formData.append('file', singleImageData.file);
+                formData.append('prompt_type', 'find');
+                formData.append('find_term', findTerm);
+                formData.append('grounding', true);
+
+                const response = await fetch(`${CONFIG.apiUrl}/ocr`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (!data.success) {
+                    throw new Error(data.error || '识别失败');
+                }
+
+                // 显示结果
+                elements.resultSection.classList.add('active');
+                elements.resultText.textContent = data.text || '未找到匹配内容';
+
+                // 绘制边界框
+                if (data.boxes && data.boxes.length > 0) {
+                    const imgElement = document.getElementById('previewImage');
+                    const canvas = document.getElementById('boundingBoxCanvas');
+                    
+                    // 保存到全局变量以便 resize 时重新绘制
+                    window.lastDrawnBoxes = data.boxes;
+                    window.lastImageDims = data.image_dims;
+                    
+                    // 等待图片完全加载后再绘制
+                    if (imgElement.complete) {
+                        drawBoundingBoxes(imgElement, canvas, data.boxes, data.image_dims);
+                    } else {
+                        imgElement.onload = () => {
+                            drawBoundingBoxes(imgElement, canvas, data.boxes, data.image_dims);
+                        };
+                    }
+
+                    addLog('✓ 查找定位成功', 'success', `找到 ${data.boxes.length} 个匹配项`, {
+                        '查找词': findTerm,
+                        '匹配数量': `${data.boxes.length} 个`,
+                        '匹配项': data.boxes.map(b => b.label).join(', ')
+                    });
+                } else {
+                    addLog('查找完成', 'info', '未找到匹配的内容', {
+                        '查找词': findTerm,
+                        '建议': '尝试使用不同的关键词'
+                    });
+                }
+
+            } catch (error) {
+                showToast('查找失败: ' + error.message, 'error');
+                addLog('✗ 查找失败', 'error', error.message, {
+                    '查找词': findTerm,
+                    '建议': '检查网络连接或更换图片'
+                });
+            }
         }
 
         // Update Progress
@@ -1573,8 +2927,419 @@
             }, 3000);
         }
 
+        // Window resize event - redraw bounding boxes
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                // 如果是 Find 模式且有图片，重新绘制边界框
+                if (state.mode === 'find' && state.singleImage) {
+                    const imgElement = document.getElementById('previewImage');
+                    const canvas = document.getElementById('boundingBoxCanvas');
+                    const container = document.getElementById('previewContainer');
+                    
+                    if (container && container.style.display !== 'none' && imgElement.complete) {
+                        // 尝试从结果中获取 boxes（如果已经处理过）
+                        const resultText = elements.resultText.textContent;
+                        if (resultText && window.lastDrawnBoxes) {
+                            drawBoundingBoxes(imgElement, canvas, window.lastDrawnBoxes, window.lastImageDims);
+                        }
+                    }
+                }
+            }, 200);
+        });
+
+        // ====================================
+        // Find Mode Functions (查找定位模式)
+        // ====================================
+        
+        const findState = {
+            image: null,
+            imageData: null,
+            processing: false
+        };
+        
+        function initFindMode() {
+            const uploadZone = document.getElementById('findUploadZone');
+            const changeBtn = document.getElementById('findChangeBtn');
+            const clearBtn = document.getElementById('findClearBtn');
+            const processBtn = document.getElementById('findProcessBtn');
+            const termInput = document.getElementById('findTermInput');
+            
+            // 上传区域点击
+            uploadZone.addEventListener('click', () => {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'image/*';
+                input.onchange = (e) => {
+                    if (e.target.files[0]) {
+                        handleFindImageUpload(e.target.files[0]);
+                    }
+                };
+                input.click();
+            });
+            
+            // 拖拽上传
+            uploadZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadZone.classList.add('drag-over');
+            });
+            
+            uploadZone.addEventListener('dragleave', () => {
+                uploadZone.classList.remove('drag-over');
+            });
+            
+            uploadZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadZone.classList.remove('drag-over');
+                if (e.dataTransfer.files[0]) {
+                    handleFindImageUpload(e.dataTransfer.files[0]);
+                }
+            });
+            
+            // 按钮事件
+            changeBtn.addEventListener('click', () => uploadZone.click());
+            clearBtn.addEventListener('click', clearFindMode);
+            processBtn.addEventListener('click', processFindMode);
+            
+            // 输入框变化
+            termInput.addEventListener('input', updateFindButtons);
+        }
+        
+        function handleFindImageUpload(file) {
+            if (!file.type.startsWith('image/')) {
+                showToast('请选择图片文件', 'error');
+                return;
+            }
+            
+            findState.image = file;
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                findState.imageData = e.target.result;
+                
+                // 显示预览
+                const preview = document.getElementById('findUploadedPreview');
+                const img = document.getElementById('findUploadedImage');
+                const info = document.getElementById('findUploadedInfo');
+                const uploadZone = document.getElementById('findUploadZone');
+                
+                img.src = e.target.result;
+                info.textContent = `📁 ${file.name} (${formatFileSize(file.size)})`;
+                
+                uploadZone.style.display = 'none';
+                preview.classList.add('active');
+                
+                // 更新按钮状态
+                updateFindButtons();
+                
+                // 清除旧结果
+                document.getElementById('findResultEmpty').style.display = 'block';
+                document.getElementById('findResultContainer').classList.remove('active');
+                
+                addLog('图片上传成功', 'success', `Find 模式: ${file.name}`, {
+                    '文件名': file.name,
+                    '大小': formatFileSize(file.size),
+                    '模式': '查找定位'
+                });
+                
+                showToast('图片上传成功', 'success');
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        function clearFindMode() {
+            findState.image = null;
+            findState.imageData = null;
+            
+            // 重置 UI
+            document.getElementById('findUploadZone').style.display = 'block';
+            document.getElementById('findUploadedPreview').classList.remove('active');
+            document.getElementById('findResultEmpty').style.display = 'block';
+            document.getElementById('findResultContainer').classList.remove('active');
+            document.getElementById('findTermInput').value = '';
+            
+            updateFindButtons();
+            
+            addLog('重置 Find 模式', 'info', '已清空图片和结果');
+            showToast('已清空', 'info');
+        }
+        
+        function updateFindButtons() {
+            const hasImage = findState.image !== null;
+            const hasTerm = document.getElementById('findTermInput').value.trim().length > 0;
+            
+            document.getElementById('findProcessBtn').disabled = !(hasImage && hasTerm) || findState.processing;
+            document.getElementById('findChangeBtn').disabled = findState.processing;
+            document.getElementById('findClearBtn').disabled = !hasImage || findState.processing;
+        }
+        
+        async function processFindMode() {
+            const findTerm = document.getElementById('findTermInput').value.trim();
+            
+            if (!findState.image || !findTerm) {
+                showToast('请上传图片并输入查找词', 'error');
+                return;
+            }
+            
+            findState.processing = true;
+            updateFindButtons();
+            
+            const processBtn = document.getElementById('findProcessBtn');
+            const originalText = processBtn.innerHTML;
+            processBtn.innerHTML = '<span>⏳</span><span>处理中...</span>';
+            
+            addLog('开始查找', 'info', `查找词: ${findTerm}`, {
+                '图片': findState.image.name,
+                '查找内容': findTerm,
+                '模式': 'Find + Grounding'
+            });
+            
+            try {
+                const formData = new FormData();
+                formData.append('file', findState.image);
+                formData.append('prompt_type', 'find');
+                formData.append('find_term', findTerm);
+                formData.append('grounding', true);
+                
+                const response = await fetch(`${CONFIG.apiUrl}/ocr`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (!data.success) {
+                    throw new Error(data.error || '识别失败');
+                }
+                
+                // 显示结果
+                displayFindResult(data, findTerm);
+                
+            } catch (error) {
+                showToast('查找失败: ' + error.message, 'error');
+                addLog('✗ 查找失败', 'error', error.message);
+            } finally {
+                findState.processing = false;
+                processBtn.innerHTML = originalText;
+                updateFindButtons();
+            }
+        }
+        
+        function displayFindResult(data, findTerm) {
+            // 隐藏空状态，显示结果
+            document.getElementById('findResultEmpty').style.display = 'none';
+            document.getElementById('findResultContainer').classList.add('active');
+            
+            // 显示结果图片
+            const resultImg = document.getElementById('findResultImage');
+            const resultCanvas = document.getElementById('findResultCanvas');
+            resultImg.src = findState.imageData;
+            
+            // 等待图片加载后绘制边界框
+            resultImg.onload = () => {
+                // 使用 requestAnimationFrame 确保图片已经渲染
+                requestAnimationFrame(() => {
+                    setTimeout(() => {
+                        if (data.boxes && data.boxes.length > 0) {
+                            drawFindBoundingBoxes(resultImg, resultCanvas, data.boxes, data.image_dims);
+                        } else {
+                            // 清空 canvas
+                            const ctx = resultCanvas.getContext('2d');
+                            resultCanvas.width = resultImg.offsetWidth;
+                            resultCanvas.height = resultImg.offsetHeight;
+                            resultCanvas.style.width = resultImg.offsetWidth + 'px';
+                            resultCanvas.style.height = resultImg.offsetHeight + 'px';
+                            ctx.clearRect(0, 0, resultCanvas.width, resultCanvas.height);
+                        }
+                    }, 50);
+                });
+            };
+            
+            // 如果图片已经加载（来自缓存），立即绘制
+            if (resultImg.complete && resultImg.naturalWidth > 0) {
+                requestAnimationFrame(() => {
+                    setTimeout(() => {
+                        if (data.boxes && data.boxes.length > 0) {
+                            drawFindBoundingBoxes(resultImg, resultCanvas, data.boxes, data.image_dims);
+                        }
+                    }, 50);
+                });
+            }
+            
+            // 显示统计信息
+            const statsHtml = [];
+            if (data.boxes && data.boxes.length > 0) {
+                statsHtml.push(`<div class="find-stat-badge success">✓ 找到 ${data.boxes.length} 个匹配项</div>`);
+                statsHtml.push(`<div class="find-stat-badge">🎯 查找词: ${findTerm}</div>`);
+            } else {
+                statsHtml.push(`<div class="find-stat-badge">❌ 未找到匹配项</div>`);
+                statsHtml.push(`<div class="find-stat-badge">🎯 查找词: ${findTerm}</div>`);
+            }
+            document.getElementById('findResultStats').innerHTML = statsHtml.join('');
+            
+            // 显示识别文本
+            document.getElementById('findResultText').textContent = data.text || '未识别到内容';
+            
+            // 显示匹配项列表
+            if (data.boxes && data.boxes.length > 0) {
+                displayFindMatches(data.boxes);
+                addLog('✓ 查找成功', 'success', `找到 ${data.boxes.length} 个匹配项`, {
+                    '查找词': findTerm,
+                    '匹配数': data.boxes.length,
+                    '匹配项': data.boxes.map(b => b.label).join(', ')
+                });
+            } else {
+                document.getElementById('findMatchesList').style.display = 'none';
+                addLog('查找完成', 'info', '未找到匹配内容', {
+                    '查找词': findTerm,
+                    '建议': '尝试其他关键词'
+                });
+            }
+            
+            showToast('识别完成', 'success');
+        }
+        
+        function drawFindBoundingBoxes(imgElement, canvas, boxes, imageDims) {
+            if (!boxes || boxes.length === 0) return;
+            
+            console.log('🎨 绘制边界框:', boxes);
+            
+            const ctx = canvas.getContext('2d');
+            
+            // 确保 Canvas 精确匹配图片显示尺寸
+            const imgWidth = imgElement.offsetWidth;
+            const imgHeight = imgElement.offsetHeight;
+            
+            canvas.width = imgWidth;
+            canvas.height = imgHeight;
+            canvas.style.width = imgWidth + 'px';
+            canvas.style.height = imgHeight + 'px';
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // 计算缩放比例（从原始图片尺寸到显示尺寸）
+            const originalWidth = imageDims?.w || imgElement.naturalWidth;
+            const originalHeight = imageDims?.h || imgElement.naturalHeight;
+            const scaleX = imgWidth / originalWidth;
+            const scaleY = imgHeight / originalHeight;
+            
+            console.log('📐 图片尺寸:', {
+                display: { w: imgWidth, h: imgHeight },
+                original: { w: originalWidth, h: originalHeight },
+                scale: { x: scaleX, y: scaleY }
+            });
+            
+            // 颜色方案
+            const colors = ['#00ff00', '#00ffff', '#ff00ff', '#ffff00', '#ff0066', '#00ff99'];
+            
+            boxes.forEach((box, idx) => {
+                const [x1, y1, x2, y2] = box.box;
+                const color = colors[idx % colors.length];
+                
+                // 缩放坐标
+                const sx = x1 * scaleX;
+                const sy = y1 * scaleY;
+                const sw = (x2 - x1) * scaleX;
+                const sh = (y2 - y1) * scaleY;
+                
+                console.log(`📦 Box ${idx} (${box.label}):`, [sx, sy, sw, sh]);
+                
+                // 半透明填充
+                ctx.fillStyle = color + '33';
+                ctx.fillRect(sx, sy, sw, sh);
+                
+                // 霓虹边框
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 4;
+                ctx.shadowColor = color;
+                ctx.shadowBlur = 15;
+                ctx.strokeRect(sx, sy, sw, sh);
+                ctx.shadowBlur = 0;
+                
+                // 标签
+                if (box.label) {
+                    ctx.font = 'bold 16px Arial';
+                    const metrics = ctx.measureText(box.label);
+                    const padding = 10;
+                    const labelHeight = 28;
+                    
+                    // 标签背景
+                    ctx.fillStyle = color;
+                    ctx.fillRect(sx, sy - labelHeight, metrics.width + padding * 2, labelHeight);
+                    
+                    // 标签文字
+                    ctx.fillStyle = '#000';
+                    ctx.fillText(box.label, sx + padding, sy - 8);
+                }
+            });
+            
+            console.log('✅ 完成绘制', boxes.length, '个边界框');
+        }
+        
+        function displayFindMatches(boxes) {
+            const matchesList = document.getElementById('findMatchesList');
+            const matchesContent = document.getElementById('findMatchesContent');
+            
+            const colors = ['#00ff00', '#00ffff', '#ff00ff', '#ffff00', '#ff0066', '#00ff99'];
+            
+            const matchesHtml = boxes.map((box, idx) => {
+                const color = colors[idx % colors.length];
+                const [x1, y1, x2, y2] = box.box;
+                return `
+                    <div class="find-match-item" style="border-color: ${color};">
+                        <div class="find-match-color" style="background: ${color};"></div>
+                        <div class="find-match-info">
+                            <div class="find-match-label">${box.label}</div>
+                            <div class="find-match-coords">[${x1}, ${y1}, ${x2}, ${y2}]</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            matchesContent.innerHTML = matchesHtml;
+            matchesList.style.display = 'block';
+        }
+        
+        // 窗口 resize 事件 - 重绘边界框
+        let findResizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(findResizeTimeout);
+            findResizeTimeout = setTimeout(() => {
+                if (state.mode === 'find' && findState.imageData) {
+                    const resultImg = document.getElementById('findResultImage');
+                    const resultCanvas = document.getElementById('findResultCanvas');
+                    const resultContainer = document.getElementById('findResultContainer');
+                    
+                    if (resultContainer.classList.contains('active') && resultImg.complete && window.lastFindBoxes) {
+                        drawFindBoundingBoxes(resultImg, resultCanvas, window.lastFindBoxes, window.lastFindImageDims);
+                    }
+                }
+            }, 200);
+        });
+        
+        // 保存边界框数据以便 resize 时重绘
+        window.lastFindBoxes = null;
+        window.lastFindImageDims = null;
+        
+        const originalDrawFindBoundingBoxes = drawFindBoundingBoxes;
+        drawFindBoundingBoxes = function(imgElement, canvas, boxes, imageDims) {
+            window.lastFindBoxes = boxes;
+            window.lastFindImageDims = imageDims;
+            originalDrawFindBoundingBoxes(imgElement, canvas, boxes, imageDims);
+        };
+        
+        // ====================================
+        // End of Find Mode Functions
+        // ====================================
+
         // Initialize app
         init();
+        initFindMode();
+        initLanguageSwitcher();
+        
+        // Apply initial language
+        updateUILanguage();
     </script>
 </body>
 </html>
