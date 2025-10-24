@@ -1,4 +1,5 @@
 # 🔍 DeepSeek-OCR-WebUI
+[Visit Application →](https://deepseek-ocr.aws.xin/)
 
 <div align="center">
 
