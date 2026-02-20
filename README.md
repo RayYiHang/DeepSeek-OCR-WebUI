@@ -22,6 +22,14 @@
 
 ## 🎉 v4.1 Update: UI Improvements & Model Version Display
 
+<div align="center">
+
+![v4.1 OCR-2 UI](./assets/v4.1_ocr2_ui.png)
+
+*Header shows OCR-2 model badge · Footer displays v4.1 · OCR-2*
+
+</div>
+
 - 🏷️ **OCR-2 Model Badge** — Header now shows a prominent `OCR-2` badge so users instantly know the model version
 - 🎨 **Table Rendering Fix** — OCR-detected tables now display with white backgrounds, dark text, and zebra striping for clear readability (previously appeared as dark/unreadable blocks)
 - 📡 **Health API `model_version`** — `/health` endpoint now returns `"model_version": "DeepSeek-OCR-2"` for programmatic version detection
