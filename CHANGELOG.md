@@ -4,6 +4,26 @@
 
 ---
 
+## [v4.1] - 2026-02-20
+
+### 🏷️ UI Improvements & Model Version Display
+
+**前端改进：**
+- Header 新增 `OCR-2` 绿色模型标识，用户一眼即知当前模型版本
+- 修复表格渲染：OCR 识别的表格现在显示白色背景、深色文字、斑马纹交替行，解决之前深色背景导致内容不可读的问题
+- Footer 版本更新为 `v4.1 · OCR-2`
+
+**API 改进：**
+- `/health` 接口新增 `model_version: "DeepSeek-OCR-2"` 字段，支持程序化版本检测
+
+**技术细节：**
+- `Preview.vue` — 表格 CSS 增加 `background-color: #ffffff`, `color: #1f2937`, `tr:nth-child(even)` 斑马纹
+- `AppHeader.vue` — 新增 `.model-badge` 组件（绿色渐变背景圆角标签）
+- `EmptyState.vue` — 版本号 v3.6 → v4.1 · OCR-2
+- `web_service_unified.py` — health response 增加 `model_version` 字段，FastAPI version → 4.1.0
+
+---
+
 ## [v4.0] - 2026-02-20
 
 ### 🧠 重大更新：DeepSeek-OCR-2 模型升级 / Major: DeepSeek-OCR-2 Model Upgrade

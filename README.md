@@ -6,7 +6,7 @@
 
 **🌐 [English](./README.md) | [简体中文](./README_zh-CN.md) | [繁體中文](./README_zh-TW.md) | [日本語](./README_ja.md)**
 
-[![Version](https://img.shields.io/badge/version-v4.0-blue.svg)](./CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-v4.1-blue.svg)](./CHANGELOG.md)
 [![Docker](https://img.shields.io/badge/docker-neosun/deepseek--ocr-brightgreen.svg)](https://hub.docker.com/r/neosun/deepseek-ocr)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](./LICENSE)
 [![Vue](https://img.shields.io/badge/Vue-3.x-4FC08D.svg)](https://vuejs.org/)
@@ -17,6 +17,15 @@
 [Features](#-features) • [Quick Start](#-quick-start) • [Screenshots](#-screenshots) • [Contributors](#-contributors)
 
 </div>
+
+---
+
+## 🎉 v4.1 Update: UI Improvements & Model Version Display
+
+- 🏷️ **OCR-2 Model Badge** — Header now shows a prominent `OCR-2` badge so users instantly know the model version
+- 🎨 **Table Rendering Fix** — OCR-detected tables now display with white backgrounds, dark text, and zebra striping for clear readability (previously appeared as dark/unreadable blocks)
+- 📡 **Health API `model_version`** — `/health` endpoint now returns `"model_version": "DeepSeek-OCR-2"` for programmatic version detection
+- 🔖 **Footer Version** — Updated to `v4.1 · OCR-2`
 
 ---
 
@@ -221,13 +230,13 @@ DeepSeek-OCR-WebUI is an intelligent document recognition web application powere
 
 ```bash
 # Pull and run
-docker pull neosun/deepseek-ocr:v4.0
+docker pull neosun/deepseek-ocr:v4.1
 docker run -d \
   --name deepseek-ocr \
   --gpus all \
   -p 8001:8001 \
   --shm-size=8g \
-  neosun/deepseek-ocr:v4.0
+  neosun/deepseek-ocr:v4.1
 
 # Access: http://localhost:8001
 ```
@@ -236,7 +245,8 @@ docker run -d \
 
 | Tag | Description |
 |-----|-------------|
-| `latest` | Latest stable (= v4.0) |
+| `latest` | Latest stable (= v4.1) |
+| `v4.1` | UI improvements & model version display |
 | `v4.0` | DeepSeek-OCR-2 model upgrade |
 | `v3.6` | Backend concurrency & rate limiting |
 | `v3.5` | Vue 3 frontend version |
@@ -339,6 +349,14 @@ Switch language via the selector in the top-right corner.
 ---
 
 ## 📊 Version History
+
+### v4.1 (2026-02-20) - UI Improvements & Model Version Display
+
+**🏷️ UI & API Enhancements:**
+- ✅ OCR-2 model badge in header for instant version recognition
+- ✅ Table rendering fix: white background, dark text, zebra striping
+- ✅ Health API returns `model_version: "DeepSeek-OCR-2"`
+- ✅ Footer updated to `v4.1 · OCR-2`
 
 ### v4.0 (2026-02-20) - DeepSeek-OCR-2 Model Upgrade
 

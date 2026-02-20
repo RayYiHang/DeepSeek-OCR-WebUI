@@ -50,7 +50,7 @@
         rel="noopener"
       >cloudman6</a>
       <div class="footer-version">
-        DeepSeek-OCR-WebUI v3.6 | © 2026
+        DeepSeek-OCR-WebUI v4.1 · OCR-2 | © 2026
       </div>
     </div>
   </div>

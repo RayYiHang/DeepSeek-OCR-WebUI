@@ -243,7 +243,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="DeepSeek-OCR Unified API",
     description="Multi-platform OCR service (MLX/CUDA)",
-    version="4.0.0",
+    version="4.1.0",
     lifespan=lifespan,
     docs_url="/docs",
     redoc_url="/redoc",
@@ -366,6 +366,7 @@ async def health_check(request: Request):
     
     response = {
         "status": status,
+        "model_version": "DeepSeek-OCR-2",
         "backend": backend_type,
         "platform": platform.system(),
         "machine": platform.machine(),
