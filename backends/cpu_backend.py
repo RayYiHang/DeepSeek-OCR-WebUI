@@ -1,35 +1,37 @@
-"""CPU Backend - Compatible with Linux/Mac without GPU"""
-from transformers import AutoProcessor, AutoModel
+"""CPU Backend - DeepSeek-OCR-2 - Compatible with Linux/Mac without GPU"""
+from transformers import AutoTokenizer, AutoModel
 import torch
 
+DEFAULT_MODEL_PATH = "deepseek-ai/DeepSeek-OCR-2"
+DEFAULT_BASE_SIZE = 1024
+DEFAULT_IMAGE_SIZE = 768
+DEFAULT_CROP_MODE = True
+
 class CPUBackend:
-    def __init__(self, model_path: str = "deepseek-ai/DeepSeek-OCR"):
+    def __init__(self, model_path: str = DEFAULT_MODEL_PATH):
         self.model_path = model_path
-        self.revision = "1e3401a3d4603e9e71ea0ec850bfead602191ec4"
         self.model = None
-        self.processor = None
+        self.tokenizer = None
         self.device = "cpu"
         
     def load_model(self):
         """Load model on CPU"""
         try:
-            print(f"📦 Loading DeepSeek-OCR on CPU")
+            print(f"📦 Loading DeepSeek-OCR-2 on CPU")
             
-            self.processor = AutoProcessor.from_pretrained(
+            self.tokenizer = AutoTokenizer.from_pretrained(
                 self.model_path,
-                revision=self.revision,
                 trust_remote_code=True
             )
             
             self.model = AutoModel.from_pretrained(
                 self.model_path,
-                revision=self.revision,
                 trust_remote_code=True,
+                use_safetensors=True,
                 torch_dtype=torch.float32,
                 low_cpu_mem_usage=True
-            ).to(self.device)
+            ).eval().to(self.device)
             
-            self.model.eval()
             print(f"✅ Model loaded on {self.device}")
             return True
             
@@ -41,14 +43,13 @@ class CPUBackend:
         """Run inference on CPU"""
         try:
             result = self.model.infer(
-                tokenizer=self.processor,
+                tokenizer=self.tokenizer,
                 prompt=prompt,
                 image_file=image_path,
                 output_path='./output',
-                base_size=1024,
-                image_size=640,
-                crop_mode=True,
-                test_compress=False,
+                base_size=DEFAULT_BASE_SIZE,
+                image_size=DEFAULT_IMAGE_SIZE,
+                crop_mode=DEFAULT_CROP_MODE,
                 save_results=False,
                 eval_mode=True
             )

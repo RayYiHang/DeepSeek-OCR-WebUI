@@ -27,13 +27,13 @@ import fitz  # PyMuPDF
 # 全局变量
 model = None
 tokenizer = None
-MODEL_PATH = 'deepseek-ai/DeepSeek-OCR'
+MODEL_PATH = 'deepseek-ai/DeepSeek-OCR-2'
 MODEL_SOURCE = None  # 记录实际使用的模型源
 
 # 模型源配置
 MODEL_SOURCES = {
-    'huggingface': 'deepseek-ai/DeepSeek-OCR',
-    'modelscope': 'deepseek-ai/DeepSeek-OCR'
+    'huggingface': 'deepseek-ai/DeepSeek-OCR-2',
+    'modelscope': 'deepseek-ai/DeepSeek-OCR-2'
 }
 
 # 自定义超时异常
@@ -66,7 +66,6 @@ def load_model_from_source(source_name: str, model_path: str, timeout: int = 300
         try:
             from modelscope import snapshot_download
             
-            # 使用 ModelScope 下载模型到本地缓存
             print(f"📥 正在从 ModelScope 下载模型...")
             print(f"   模型路径: {model_path}")
             print(f"   缓存目录: {os.environ.get('MODELSCOPE_CACHE', os.path.expanduser('~/.cache/modelscope'))}")
@@ -78,7 +77,6 @@ def load_model_from_source(source_name: str, model_path: str, timeout: int = 300
             )
             print(f"✅ ModelScope 模型已下载到: {local_model_path}")
             
-            # 从本地路径加载
             print(f"📦 正在从本地路径加载模型...")
             tokenizer = AutoTokenizer.from_pretrained(
                 local_model_path,
@@ -87,9 +85,9 @@ def load_model_from_source(source_name: str, model_path: str, timeout: int = 300
             
             model = AutoModel.from_pretrained(
                 local_model_path,
+                _attn_implementation='flash_attention_2',
                 trust_remote_code=True,
                 use_safetensors=True,
-                attn_implementation="eager",
                 torch_dtype=torch.bfloat16,
             ).eval().to("cuda")
             
@@ -103,26 +101,22 @@ def load_model_from_source(source_name: str, model_path: str, timeout: int = 300
     else:
         # HuggingFace 加载
         try:
-            # 设置 requests 超时（通过环境变量）
-            # transformers 内部使用 requests，可以通过设置环境变量控制超时
             os.environ['HF_HUB_DOWNLOAD_TIMEOUT'] = str(timeout)
             
             print(f"📥 正在从 HuggingFace 下载模型...")
             print(f"   超时设置: {timeout} 秒")
             
-            # 尝试加载 tokenizer
             tokenizer = AutoTokenizer.from_pretrained(
                 model_path,
                 trust_remote_code=True,
             )
             print(f"✅ Tokenizer 加载成功")
             
-            # 尝试加载模型
             model = AutoModel.from_pretrained(
                 model_path,
+                _attn_implementation='flash_attention_2',
                 trust_remote_code=True,
                 use_safetensors=True,
-                attn_implementation="eager",
                 torch_dtype=torch.bfloat16,
             ).eval().to("cuda")
             print(f"✅ Model 加载成功")
@@ -134,7 +128,6 @@ def load_model_from_source(source_name: str, model_path: str, timeout: int = 300
             raise ModelLoadTimeoutError(f"HuggingFace 连接超时 ({timeout} 秒)")
         except Exception as e:
             error_msg = str(e).lower()
-            # 检查是否是网络相关错误
             if any(keyword in error_msg for keyword in ['timeout', 'connection', 'network', 'unreachable', 'refused']):
                 print(f"⏱️ HuggingFace 网络错误: {e}")
                 raise ModelLoadTimeoutError(f"HuggingFace 网络错误: {e}")
@@ -381,10 +374,9 @@ async def ocr_endpoint(
             image_file=tmp_file,
             output_path=output_dir,
             base_size=1024,
-            image_size=640,
+            image_size=768,
             crop_mode=True,
             save_results=False,
-            test_compress=False,
             eval_mode=True,
         )
         

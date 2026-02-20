@@ -1,14 +1,19 @@
-"""CUDA Backend for NVIDIA GPUs"""
+"""CUDA Backend for NVIDIA GPUs - DeepSeek-OCR-2"""
 import os
-from transformers import AutoProcessor, AutoModel
+from transformers import AutoTokenizer, AutoModel
 import torch
 
+# DeepSeek-OCR-2 default parameters (from official config)
+DEFAULT_MODEL_PATH = "deepseek-ai/DeepSeek-OCR-2"
+DEFAULT_BASE_SIZE = 1024
+DEFAULT_IMAGE_SIZE = 768
+DEFAULT_CROP_MODE = True
+
 class CUDABackend:
-    def __init__(self, model_path: str = "deepseek-ai/DeepSeek-OCR"):
+    def __init__(self, model_path: str = DEFAULT_MODEL_PATH):
         self.model_path = model_path
-        self.revision = "1e3401a3d4603e9e71ea0ec850bfead602191ec4"  # MPS support commit
         self.model = None
-        self.processor = None
+        self.tokenizer = None
         
     @staticmethod
     def get_optimal_dtype():
@@ -16,23 +21,19 @@ class CUDABackend:
         if not torch.cuda.is_available():
             return torch.float32
         
-        # Check if GPU supports bfloat16 (compute capability >= 8.0)
         capability = torch.cuda.get_device_capability()
         if capability[0] >= 8:
-            # Ampere and newer (RTX 30xx, A100, etc.)
             return torch.bfloat16
         else:
-            # Older GPUs (RTX 20xx, GTX 10xx, etc.) - use float16
             print(f"⚠️ GPU compute capability {capability[0]}.{capability[1]} < 8.0, using float16 instead of bfloat16")
             return torch.float16
         
     def load_model(self, source: str = "huggingface", timeout: int = 300):
         """Load CUDA model"""
         try:
-            print(f"📦 Loading DeepSeek-OCR on CUDA")
+            print(f"📦 Loading DeepSeek-OCR-2 on CUDA")
             
             if source == "modelscope":
-                # ModelScope fallback for China
                 from modelscope import snapshot_download
                 local_path = snapshot_download(
                     model_id=self.model_path,
@@ -40,31 +41,28 @@ class CUDABackend:
                     revision='master'
                 )
                 model_path = local_path
-                revision = None
             else:
                 os.environ['HF_HUB_DOWNLOAD_TIMEOUT'] = str(timeout)
                 model_path = self.model_path
-                revision = self.revision
             
-            self.processor = AutoProcessor.from_pretrained(
+            self.tokenizer = AutoTokenizer.from_pretrained(
                 model_path,
-                revision=revision,
                 trust_remote_code=True
             )
             
-            # Use optimal dtype based on GPU capability
             optimal_dtype = self.get_optimal_dtype()
             print(f"📊 Using dtype: {optimal_dtype}")
             
+            # Use flash_attention_2 for CUDA (recommended by OCR-2)
             self.model = AutoModel.from_pretrained(
                 model_path,
-                revision=revision,
+                _attn_implementation='flash_attention_2',
                 trust_remote_code=True,
+                use_safetensors=True,
                 torch_dtype=optimal_dtype,
                 low_cpu_mem_usage=True
-            ).to("cuda")
+            ).eval().to("cuda")
             
-            self.model.eval()
             print(f"✅ Model loaded on CUDA from {source}")
             return True
             
@@ -76,14 +74,13 @@ class CUDABackend:
         """Run inference on CUDA"""
         try:
             result = self.model.infer(
-                tokenizer=self.processor,
+                tokenizer=self.tokenizer,
                 prompt=prompt,
                 image_file=image_path,
                 output_path='./output',
-                base_size=1024,
-                image_size=640,
-                crop_mode=True,
-                test_compress=False,
+                base_size=DEFAULT_BASE_SIZE,
+                image_size=DEFAULT_IMAGE_SIZE,
+                crop_mode=DEFAULT_CROP_MODE,
                 save_results=False,
                 eval_mode=True
             )

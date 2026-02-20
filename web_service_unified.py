@@ -192,12 +192,12 @@ async def lifespan(app: FastAPI):
     global backend, backend_type, ocr_semaphore, pdf_semaphore
     
     print("="*50)
-    print("🚀 DeepSeek-OCR Unified Service Starting...")
+    print("🚀 DeepSeek-OCR-2 Unified Service Starting...")
     print("="*50)
     
     # Check for local model path
     local_model_path = os.environ.get("LOCAL_MODEL_PATH", "")
-    model_path = local_model_path if local_model_path else "deepseek-ai/DeepSeek-OCR"
+    model_path = local_model_path if local_model_path else "deepseek-ai/DeepSeek-OCR-2"
     
     if local_model_path:
         print(f"📁 Using local model: {local_model_path}")
